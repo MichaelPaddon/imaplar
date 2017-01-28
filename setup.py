@@ -6,6 +6,7 @@ setuptools.setup(
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP folder monitor",
+    url = "https://github.com/MichaelPaddon/imaplar",
     license = "GPLv3",
     keywords = "imap",
     packages = setuptools.find_packages(),
