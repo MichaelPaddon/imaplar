@@ -2,6 +2,7 @@ import argparse
 import configparser
 import logging.config
 import os
+import pkg_resources
 import sys
 import threading
 import imaplar
@@ -11,8 +12,14 @@ def main(argv = sys.argv):
     parser = argparse.ArgumentParser(prog = argv[0],
         description = "IMAP Watcher")
     parser.add_argument("--config", action = "append")
+    parser.add_argument("--version", action= "store_true")
     parser.add_argument("servers", metavar = "server", nargs="*")
     ns = parser.parse_args(args = argv[1:])
+
+    # report version?
+    if ns.version:
+       print(pkg_resources.require("imaplar")[0].version)
+       return
 
     # read configuration
     config = configparser.ConfigParser()
