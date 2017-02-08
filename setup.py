@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name = "imaplar",
-    version = "0.2",
+    version = "0.3",
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP folder monitor",

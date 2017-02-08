@@ -1,3 +1,9 @@
+"""
+Imaplar is a program which monitors email folders on IMAP servers for
+incoming messages. When a message arrives, it is passed to a policy which
+decides how it should be handled.
+"""
+
 import backports.ssl
 import email.parser
 import imapclient
@@ -9,6 +15,10 @@ from . import policy
 from . import util
 
 class Monitor:
+    """
+    Folder monitor.
+    """
+
     def __init__(self, config, section):
         # imap server configuration
         self._host = config.get(section, "host", fallback = "localhost")
