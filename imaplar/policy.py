@@ -46,7 +46,8 @@ class Zuul(Null):
         message = client.fetch_headers(uid)[uid]
 
         # get return path
-        return_path = email.utils.parseaddr(message.get("Return-Path", ""))[1]
+        return_path = email.utils.parseaddr(
+            str(message.get("Return-Path", "")))[1]
         if not return_path:
             logging.warning("{}/{}: no return path".format(folder, uid))
             return
@@ -66,7 +67,8 @@ class Zuul(Null):
                         yield (folder, uid)
 
         # challenge response?
-        in_reply_to = email.utils.parseaddr(message.get("In-Reply-To", ""))[1]
+        in_reply_to = email.utils.parseaddr(
+            str(message.get("In-Reply-To", "")))[1]
         if in_reply_to and any(search([
                 "HEADER", "Message-Id", in_reply_to], sent_folders)):
             logging.debug("{}/{}: challenge response from {}".format(
@@ -112,7 +114,7 @@ class Zuul(Null):
         def challenge():
             # don't challenge auto submitted email
             auto_submitted = email.utils.parseaddr(
-                message.get("Auto-Submitted", "no"))[1].lower()
+                str(message.get("Auto-Submitted", "no")))[1].lower()
             if auto_submitted != "no":
                 logging.info("{}/{}: autosubmitted, no challenge".format(
                     folder, uid))
@@ -127,7 +129,7 @@ class Zuul(Null):
             # don't challenge low precedence email
             precedences = {precedence.lower()
                 for _, precedence in email.utils.getaddresses(
-                    message.get_all("Precedence", []))}
+                    str(message.get_all("Precedence", [])))}
             if precedences & set(["bulk", "junk", "list"]):
                 logging.info("{}/{}: low precedence, no challenge".format(
                     folder, uid))
@@ -136,12 +138,12 @@ class Zuul(Null):
             # don't challenge email not addressed to me
             recipients = {address for _, address in email.utils.getaddresses(
                 itertools.chain.from_iterable([
-                    message.get_all("To", []),
-                    message.get_all("Cc", []),
-                    message.get_all("Bcc", []),
-                    message.get_all("Resent-To", []),
-                    message.get_all("Resent-Cc", []),
-                    message.get_all("Resent-Bcc", [])]))}
+                    str(message.get_all("To", [])),
+                    str(message.get_all("Cc", [])),
+                    str(message.get_all("Bcc", [])),
+                    str(message.get_all("Resent-To", [])),
+                    str(message.get_all("Resent-Cc", [])),
+                    str(message.get_all("Resent-Bcc", []))]))}
             if not recipients & set(self._my_addresses):
                 logging.info("{}/{}: not addressed to me, no challenge".format(
                     folder, uid))
@@ -165,7 +167,7 @@ class Zuul(Null):
             challenge["Date"] = email.utils.format_datetime(
                 email.utils.localtime())
             challenge["Subject"] = "Re: {}".format(
-                "".join(message.get("Subject", "").splitlines()))
+                "".join(str(message.get("Subject", "")).splitlines()))
             challenge["Auto-Submitted"] = "auto-replied; challenge"
             challenge["Message-Id"] = email.utils.make_msgid(
                 os.urandom(8).hex())
@@ -186,7 +188,6 @@ class Zuul(Null):
                 challenge.as_bytes()
             except:
                 challenge.replace_header("Subject", "Re:")
-            print(challenge)
 
             # send challenge
             logging.debug("{}/{}: sending challenge".format(folder, uid))
@@ -206,4 +207,3 @@ class Zuul(Null):
         client.select_folder(folder)
         client.move(uid, spam_folder)
         client.expunge()
-
