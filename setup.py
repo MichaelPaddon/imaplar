@@ -11,6 +11,7 @@ setuptools.setup(
     license = "GPLv3",
     keywords = "imap",
     packages = setuptools.find_packages(),
+    python_requires = ">=3.5",
     install_requires = [
         "imapclient",
         "tenacity"
