@@ -1,4 +1,3 @@
-import collections
 import imapclient
 import importlib
 import logging
@@ -141,9 +140,6 @@ class OAuth2Authenticator(Authenticator):
         mech = config.get(section, "oauth2_mech", fallback = "XOAUTH2")
         vendor = config.get(section, "oauth2_vendor", fallback = None)
         return cls(url, user, access_token, mech, vendor)
-
-Backoff = collections.namedtuple("Backoff",
-        ["initial", "max", "multiplier", "jitter"])
 
 class Session:
     default_poll = 60
