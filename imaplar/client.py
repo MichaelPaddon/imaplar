@@ -49,20 +49,26 @@ class IMAPClient(imapclient.IMAPClient):
     def wait_poll(self, poll):
         while True:
             logging.info("poll for new messages")
-            status, responses = self.noop()
-            if any([x for x in responses if x[-1] == b"EXISTS"]):
-                return responses
+            response = self.noop()
+            if response:
+                if any([x for x in response[1] if x[1] == b"EXISTS"]):
+                    return response[1]
+            else:
+                raise imapclient.IMAPClientAbortError("connection dropped")
             logging.info("sleep for {} seconds".format(poll))
-            time.sleep(period)
+            time.sleep(poll)
 
     def wait_idle(self):
         self.idle()
         while True:
             logging.info("idle for new messages")
-            responses = self.idle_check()
-            if any([x for x in responses if x[-1] == b"EXISTS"]):
-                self.idle_done()
-                return responses
+            response = self.idle_check()
+            if response:
+                if any([x for x in response if x[1] == b"EXISTS"]):
+                    self.idle_done()
+                    return response[1:]
+            else:
+                raise imapclient.IMAPClientAbortError("connection dropped")
 
 class IMAPClientFactory:
     def __init__(self, host, **kwargs):
@@ -140,6 +146,8 @@ Backoff = collections.namedtuple("Backoff",
         ["initial", "max", "multiplier", "jitter"])
 
 class Session:
+    default_poll = 60
+
     def __init__(self, clientfactory, starttls, authenticator,
             mailbox, query, poll, policy):
         self._clientfactory = clientfactory
@@ -154,6 +162,13 @@ class Session:
             wait = tenacity.wait_exponential(max = 120)
                     + tenacity.wait_random(5),
             after = tenacity.after_log(logging.getLogger(), logging.ERROR))
+    def retry(self):
+        try:
+            self.run()
+        except:
+            logging.exception("session aborted")
+            raise
+
     def run(self):
         # connect to serve
         client = self._clientfactory.new()
@@ -172,7 +187,7 @@ class Session:
             wait = client.wait_idle
         else:
             wait = lambda: client.wait_poll(
-                    60 if self._poll <= 0 else self._poll)
+                    self._poll if self._poll > 0 else self.default_poll)
 
         # process initial query messages
         client.select_folder(self._mailbox, readonly = True)

@@ -39,7 +39,7 @@ def main(argv = sys.argv):
 
     # run sessions
     for session in sessions:
-        thread = threading.Thread(target = session.run)
+        thread = threading.Thread(target = session.retry)
         thread.start()
 
 if __name__ == "__main__":
