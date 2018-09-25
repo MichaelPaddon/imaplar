@@ -1,3 +1,10 @@
+"""
+Configuration
+=============
+
+
+"""
+
 import imapclient
 import importlib
 import logging
@@ -20,6 +27,7 @@ class SSLContext(ssl.SSLContext):
 
     @classmethod
     def configure(cls, config, section): 
+        """Configure SSL Context"""
         cert_required = config.getboolean(section, "ssl_cert_required",
                 fallback = True)
         check_hostname = config.getboolean(section, "ssl_check_hostname",

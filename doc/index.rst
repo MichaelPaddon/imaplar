@@ -3,17 +3,32 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Imaplar's documentation!
-===================================
+Imaplar Documentation
+*********************
 
-Contents:
+Overview
+========
+
+Imaplar [#f1]_ monitors mailboxes on IMAP servers for incoming messages.
+When a message arrives, it is passed to a user defined policy
+which decides how it should be handled.
+
+Invoking
+========
+
+Synopsis
+--------
+``imaplar [--config CONFIG] [server...]``
+
+
+Options:
+--------:
+
+:--config CONFIG: 
+
 
 .. toctree::
    :maxdepth: 2
-
-.. automodule:: imaplar
-   :members:
-
 
 Indices and tables
 ==================
@@ -22,3 +37,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. rubric:: Footnotes
+.. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_ were ancient Roman guardian deities.
