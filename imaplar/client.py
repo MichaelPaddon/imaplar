@@ -150,8 +150,6 @@ class OAuth2Authenticator(Authenticator):
         return cls(url, user, access_token, mech, vendor)
 
 class Session:
-    default_poll = 60
-
     def __init__(self, clientfactory, starttls, authenticator,
             mailbox, query, poll, policy):
         self._clientfactory = clientfactory
@@ -187,11 +185,9 @@ class Session:
             self._authenticator.authenticate(client)
 
         # choose wait mechanism
-        if self._poll <= 0 and client.has_capability("IDLE"):
-            wait = client.wait_idle
-        else:
-            wait = lambda: client.wait_poll(
-                    self._poll if self._poll > 0 else self.default_poll)
+        wait = client.wait_idle\
+            if self._poll <= 0\
+            else lambda: client.wait_poll(self._poll)
 
         # process initial query messages
         client.select_folder(self._mailbox, readonly = True)
