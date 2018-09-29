@@ -152,6 +152,9 @@ A simple example configuration file looks like this::
   [server]
   host = imap.example.com
   starttls = true
+  authentication = login
+  login_username = my_name
+  login_password = my_secret
   mailboxes = inbox
 
   [inbox]
