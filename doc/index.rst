@@ -1,14 +1,24 @@
-.. Imaplar documentation master file, created by
-   sphinx-quickstart on Mon Sep 24 05:16:40 2018.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Imaplar
 *******
 
 *Imaplar* [#f1]_ monitors mailboxes on IMAP servers for incoming messages.
 When a message arrives, it is passed to a user defined policy
 which decides how it should be handled.
+
+Synopsis
+========
+**imaplar**
+[**--config** *path*]
+[*server...*]
+
+**--config** *path*
+  Read the specified configuration file.
+  This option may be specified multiple times,
+  in which case the files are processed in order.
+
+*server*
+  Process the configuration section named *server*.
+  By default, the section named "server" is processed.
 
 Configuration
 =============
@@ -131,7 +141,7 @@ policy  string imaplar.policy.default Python callable implementing user policy
 Logging Configuration
 ---------------------
 
-Standard Python `logging configuration <https://docs.python.org/3/library/logging.config.html#logging-config-fileformat`_ is supported.
+Logging may be configured using the `standard python mechanism <https://docs.python.org/3/library/logging.config.html#logging-config-fileformat`_.
 
 Example
 -------
@@ -168,30 +178,8 @@ Logging to standard output may be enabled with additional sections::
   [formatter_timestamp]
   format = %(asctime)s %(levelname)s %(message)s
 
-Invoking
+Policies
 ========
-
-Synopsis
---------
-**imaplar**
-[**--config** *CONFIG*]
-[*server...*]
-
-Description
------------
-
-Monitors IMAP mailboxes for incoming mail.
-
-**--config** *CONFIG*
-  Read the specified configuration file. May be specified multiple times.
-  If any configuration files are specified, the default ones are ignored.
-
-*server*
-  A server configuration section.
-  If no servers are specified, "server" is configured.
-
-.. toctree::
-   :maxdepth: 2
 
 Indices and tables
 ==================
@@ -199,6 +187,9 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. toctree::
+   :maxdepth: 2
 
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_ were ancient Roman guardian deities.
