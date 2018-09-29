@@ -222,11 +222,12 @@ class Session:
             query = config.get(subsection, "query", fallback = "UNSEEN")
             poll = config.getfloat(subsection, "poll", fallback = 0)
             policy = config.get(subsection, "policy",
-                    fallback = "imaplar.policy.default")
+                    fallback = "imaplar.policy.Policy")
 
-            parent, _, name = policy.rpartition(".")
-            module = importlib.import_module(parent)
-            policy_callable = getattr(module, name)
+            policy_module_name, _, policy_class_name = policy.rpartition(".")
+            policy_module = importlib.import_module(policy_module_name)
+            policy_class = getattr(policy_module, policy_class_name)
+            policy_callable = policy_class(config)
 
             yield cls(clientfactory, starttls, authenticator,
                     mailbox, query, poll, policy_callable)

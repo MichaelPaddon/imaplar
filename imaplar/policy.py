@@ -111,6 +111,13 @@ class MultiHeaderQuery(Query):
         super().__init__(functools.reduce(lambda x, y: x.or_(y), queries))
 
 class Policy:
+    def __init__(self, config):
+        self.config = config
+
+    def __call__(self, message):
+        logging.info("processing message {}".format(message.msgid))
+
+class SimplePolicy(Policy):
     def __call__(self, message):
         logging.info("processing message {}".format(message.msgid))
 
@@ -141,5 +148,3 @@ class Policy:
 
         message.fileinto("Spam")
         return
-
-default = Policy()

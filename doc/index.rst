@@ -125,17 +125,17 @@ Each server configuration specifies a list of mailbox sections,
 one for each mailbox to be monitored.
 The following options are supported in mailbox sections:
 
-======= ====== ====================== ===========
-Option  Type   Default                Description
-======= ====== ====================== ===========
-mailbox string *section name*         IMAP mailbox name
-query   string UNSEEN                 IMAP search criteria to select messages
-                                      to process on startup
-                                      ("NOT ALL" disables startup processing)
-poll    float  0                      polling interval in seconds
-                                      (0 enables use of IMAP IDLE option)
-policy  string imaplar.policy.default Python callable implementing user policy
-======= ====== ====================== ===========
+======= ====== ===================== ===========
+Option  Type   Default               Description
+======= ====== ===================== ===========
+mailbox string *section name*        IMAP mailbox name
+query   string UNSEEN                IMAP search criteria to select messages
+                                     to process on startup
+                                     ("NOT ALL" disables startup processing)
+poll    float  0                     polling interval in seconds
+                                     (0 enables use of IMAP IDLE option)
+policy  string imaplar.policy.Policy Python callable implementing user policy
+======= ====== ===================== ===========
 
 .. note::
    The default policy does nothing.
