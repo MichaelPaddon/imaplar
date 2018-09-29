@@ -27,10 +27,12 @@ Configuration
 `usual Python format <https://docs.python.org/3/library/configparser.html>`_.
 By default, the following configuration files (if they exist)
 are processed in order:
+
   1. ``~/.imaplar``
   2. ``~/.imaplar.cfg``
   3. ``.imaplar``
   4. ``.imaplar.cfg``
+
 This may be overridden on the command line.
 
 .. note::
@@ -141,7 +143,7 @@ policy  string imaplar.policy.default Python callable implementing user policy
 Logging Configuration
 ---------------------
 
-Logging may be configured using the `standard python mechanism <https://docs.python.org/3/library/logging.config.html#logging-config-fileformat`_.
+Logging may be configured using the `standard python mechanism <https://docs.python.org/3/library/logging.config.html#logging-config-fileformat>`_.
 
 Example
 -------
