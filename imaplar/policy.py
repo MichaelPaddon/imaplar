@@ -1,6 +1,5 @@
 import email.parser
-import functools
-import imaplib
+import itertools
 import logging
 
 class Message:
@@ -23,7 +22,6 @@ class Message:
     def msgid(self):
         return self._msgid
 
-    @property
     def envelope(self):
         if not self._envelope:
             self._client.select_folder(self._mailbox, readonly = True)
@@ -31,7 +29,6 @@ class Message:
             self._envelope = response[self._msgid][b"ENVELOPE"]
         return self._envelope
 
-    @property
     def message(self):
         if not self._message:
             self._client.select_folder(self._mailbox, readonly = True)
@@ -40,37 +37,29 @@ class Message:
             self._message = parser.parsebytes(response[self._msgid][b"BODY[]"])
         return self._message
 
-    @property
-    def from_addrs(self):
-        return self._addrs(self.envelope.from_)
+    def froms(self):
+        return self.addr_specs(self.envelope().from_)
 
-    @property
-    def sender_addrs(self):
-        return self._addrs(self.envelope.sender)
+    def senders(self):
+        return self.addr_specs(self.envelope().sender)
 
-    @property
-    def reply_to_addrs(self):
-        return self._addrs(self.envelope.reply_to)
+    def reply_tos(self):
+        return self.addr_specs(self.envelope().reply_to)
 
-    @property
-    def to_addrs(self):
-        return self._addrs(self.envelope.to)
+    def tos(self):
+        return self.addr_specs(self.envelope().to)
 
-    @property
-    def cc_addrs(self):
-        return self._addrs(self.envelope.cc)
+    def ccs(self):
+        return self.addr_specs(self.envelope().cc)
 
-    @property
-    def bcc_addrs(self):
-        return self._addrs(self.envelope.bcc)
+    def bccs(self):
+        return self.addr_specs(self.envelope().bcc)
 
-    @property
     def originators(self):
-        return self.from_addrs | self.sender_addrs | self.reply_to_addrs
+        return self.froms() | self.senders() | self.reply_tos()
 
-    @property
     def recipients(self):
-        return self.to_addrs | self.cc_addrs | bcc_addrs
+        return self.tos() | self.ccs() | self.bccs()
 
     def fileinto(self, mailbox):
         try:
@@ -91,60 +80,72 @@ class Message:
             self._client.delete_messages([self._msgid])
         self._client.close_folder()
 
-    def _addrs(self, addresses):
-        return set("{}@{}".format(a.mailbox.decode(), a.host.decode())
+    @staticmethod
+    def addr_specs(addresses):
+        return set(b"%s@%s" % (a.mailbox, a.host)
                 for a in addresses if a.mailbox and a.host)
 
-class Query(list):
-    def __init__(self, *args):
-        super().__init__(args)
-
-    def and_(self, other):
-        return Query(self, other)
-
-    def or_(self, other):
-        return Query("OR", self, other)
-
-class MultiHeaderQuery(Query):
-    def __init__(self, headers, strings):
-        queries = [Query("HEADER", h, s) for h in headers for s in strings]
-        super().__init__(functools.reduce(lambda x, y: x.or_(y), queries))
-
 class Policy:
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, config, section):
+        self._config = config
+        self._section = section
+
+    @property
+    def config(self):
+        return self._config
+
+    @property
+    def section(self):
+        return self._section
 
     def __call__(self, message):
-        logging.info("processing message {}".format(message.msgid))
+        logging.info("processing message {}/{}".format(
+                message.mailbox, message.msgid))
+        self.process(message)
+        logging.info("processing completed")
 
-class SimplePolicy(Policy):
-    def __call__(self, message):
-        logging.info("processing message {}".format(message.msgid))
+    def process(self, message):
+        pass
 
-        folders = ["Sent"]
-        query = MultiHeaderQuery(
+    def recipient_query(self, strings):
+        return self.header_query(
                 ["To", "Cc", "Bcc", "Resent-To", "Resent-Cc", "Resent-Bcc"],
-                message.originators)
-        if any(message.client.search_folders(folders, query)):
-            logging.info("found sent to originator".format(message.msgid))
-            return
+                strings)
 
-        folders = ["Spam"]
-        query = MultiHeaderQuery(
+    def originator_query(self, strings):
+        return self.header_query(
                 ["From", "Sender", "Reply-To"],
-                message.originators)
-        if any(message.client.search_folders(folders, query)):
-            logging.info("found spam from originator".format(message.msgid))
-            message.fileinto("Spam")
-            return
+                strings)
 
-        folders = ["Inbox"]
-        query = Query("SEEN").and_(MultiHeaderQuery(
-                ["From", "Sender", "Reply-To"],
-                message.originators))
-        if any(message.client.search_folders(folders, query)):
-            logging.info("found ham from originator".format(message.msgid))
-            return
+    @staticmethod
+    def header_query(fields, strings):
+        terms = len(fields) * len(strings)
+        query = ["OR"] * (terms - 1)
+        query.extend(itertools.chain.from_iterable(
+            [["HEADER", f, s] for f in fields for s in strings]))
+        return query
 
+class DefaultPolicy(Policy):
+    def process(self, message):
+        originators = message.originators()
+        if originators:
+            query = self.recipient_query(originators)
+            if any(message.client.search_folders(query, ["Sent"])):
+                logging.info("mail sent to an originator")
+                return
+
+            query = self.originator_query(originators)
+            if any(message.client.search_folders(query, ["Spam"])):
+                logging.info("spam received from an originator")
+                logging.info("file into {}".format("Spam"))
+                message.fileinto("Spam")
+                return
+
+            query = ["SEEN"] + self.originator_query(originators)
+            if any(message.client.search_folders(query, ["Inbox"])):
+                logging.info("ham received from an originator")
+                return
+
+        logging.info("unknown originator(s)")
+        logging.info("file into {}".format("Spam"))
         message.fileinto("Spam")
-        return

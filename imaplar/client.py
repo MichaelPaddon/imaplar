@@ -1,10 +1,3 @@
-"""
-Configuration
-=============
-
-
-"""
-
 import imapclient
 import importlib
 import logging
@@ -39,21 +32,17 @@ class SSLContext(ssl.SSLContext):
                 check_hostname, cafile, capath, cadata)
 
 class IMAPClient(imapclient.IMAPClient):
-    def glob_folder(self, pattern):
-        if "*" in pattern or "%" in pattern:
-            for flags, delimiter, name in self.list_folders(
-                    pattern = pattern):
-                yield name
-            else:
-                yield pattern
+    def list_folder_names(self, pattern):
+        for flags, delimiter, name in self.list_folders(pattern = pattern):
+            yield name
 
-    def search_folders(self, folders, query):
+    def search_folders(self, criteria, folders, charset = None):
         for folder in folders:
             self.select_folder(folder, readonly = True)
-            for msgid in self.search(query):
+            for msgid in self.search(criteria, charset):
                 yield folder, msgid
 
-    def wait_poll(self, poll):
+    def wait_poll(self, delay):
         while True:
             logging.info("poll for new messages")
             response = self.noop()
@@ -62,8 +51,8 @@ class IMAPClient(imapclient.IMAPClient):
                     return response[1]
             else:
                 raise imapclient.IMAPClientAbortError("connection dropped")
-            logging.info("sleep for {} seconds".format(poll))
-            time.sleep(poll)
+            logging.info("sleep for {} seconds".format(delay))
+            time.sleep(delay)
 
     def wait_idle(self):
         self.idle()
@@ -222,12 +211,12 @@ class Session:
             query = config.get(subsection, "query", fallback = "UNSEEN")
             poll = config.getfloat(subsection, "poll", fallback = 0)
             policy = config.get(subsection, "policy",
-                    fallback = "imaplar.policy.Policy")
+                    fallback = "imaplar.policy.DefaultPolicy")
 
             policy_module_name, _, policy_class_name = policy.rpartition(".")
             policy_module = importlib.import_module(policy_module_name)
             policy_class = getattr(policy_module, policy_class_name)
-            policy_callable = policy_class(config)
+            policy_callable = policy_class(config, section)
 
             yield cls(clientfactory, starttls, authenticator,
                     mailbox, query, poll, policy_callable)
