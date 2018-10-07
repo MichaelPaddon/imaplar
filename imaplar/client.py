@@ -211,7 +211,7 @@ class Session:
             query = config.get(subsection, "query", fallback = "UNSEEN")
             poll = config.getfloat(subsection, "poll", fallback = 0)
             policy = config.get(subsection, "policy",
-                    fallback = "imaplar.policy.DefaultPolicy")
+                    fallback = "imaplar.policy.Policy")
 
             policy_module_name, _, policy_class_name = policy.rpartition(".")
             policy_module = importlib.import_module(policy_module_name)
