@@ -22,8 +22,7 @@ setuptools.setup(
     url = "https://github.com/MichaelPaddon/imaplar",
     license = "GPLv3+",
     keywords = "imap",
-    packages = setuptools.find_namespace_packages(),
-    zip_safe = False,
+    packages = setuptools.find_namespace_packages(include = ["imaplar"]),
     python_requires = ">=3.7",
     install_requires = [
         "Cerberus",

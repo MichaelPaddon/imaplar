@@ -20,7 +20,7 @@ from . import schema
 class ConfigurationError(Exception):
     pass
 
-version = "0.5"
+version = "0.6"
 
 tls_modes = {
     "disabled": imap.TLSMode.DISABLED,
