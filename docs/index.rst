@@ -1,9 +1,9 @@
 Imaplar
 *******
 
-*Imaplar* [#f1]_ monitors mailboxes on IMAP servers for incoming messages.
-When a message arrives, it is passed to a user defined policy
-which decides how it should be handled.
+*Imaplar* [#f1]_ monitors one or more mailboxes on one or more IMAP servers.
+Unseen and incoming messages are passed to a user defined policy for
+processing.
 
 Synopsis
 ========
@@ -20,12 +20,17 @@ Synopsis
 Configuration
 =============
 
-*Imaplar* is configured by a YAML file.
-The default confguration file is ``~/.imaplar``.
+*Imaplar* is configured by a `YAML <https://yaml.org>`_ file, 
+by default ``~/.imaplar``.
 This can be overridden on the command line.
 
 .. note::
    You must supply a configuration for *imaplar* to do anything useful.
+
+.. caution::
+   The configuration file contains authentication secrets
+   and code which will be executed.
+   It should be readable and writable only by its owner.
 
 Server Configuration
 --------------------
@@ -63,6 +68,22 @@ The ``policies`` directory defines how messages are handled::
   policies:                           -- required dictionary
     <policy>: |                       -- policy name
       <python script>                 -- arbitrary code
+
+On connecting to a server, the python script is executed
+first for every existing unseen message, and subsequently for every
+newly arrived unseen message in each monitored mailbox.
+
+The following global variables are provided to the script:
+
+* **client**: an instance of `imapclient.IMAPCLient
+  <https://imapclient.readthedocs.io/en/2.1.0/api.html>`_,
+  connected to the server
+* **mailbox**: the name of the monitored mailbox
+* **msgid**: the id of the message to process
+
+.. note::
+   A policy script should *not* assume that the currently selected
+   mailbox (if any) is the monitored mailbox.
 
 Logging Configuration
 ---------------------
@@ -104,8 +125,6 @@ A simple example configuration file looks like this::
       timestamp:
         format: "%(asctime)s %(levelname)s %(message)s"
     
-.. toctree::
-   :maxdepth: 2
-
 .. rubric:: Footnotes
-.. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_ were ancient Roman guardian deities.
+.. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
+   were ancient Roman guardian deities.
