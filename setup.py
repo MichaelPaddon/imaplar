@@ -12,7 +12,8 @@ setuptools.setup(
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP mailbox monitor",
-    long_description=long_description,
+    long_description = long_description,
+    long_description_content_type = "text/markdown",
     classifiers = [
         'Programming Language :: Python :: 3',
         'Development Status :: 3 - Alpha',
