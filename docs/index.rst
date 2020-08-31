@@ -104,13 +104,6 @@ A simple example configuration file looks like this::
       timestamp:
         format: "%(asctime)s %(levelname)s %(message)s"
     
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
 .. toctree::
    :maxdepth: 2
 
