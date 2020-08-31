@@ -1,6 +1,6 @@
 import os.path
 import setuptools
-import imaplar.version
+import imaplar.shell
 
 directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(directory, 'README.md'), encoding='utf-8') as f:
@@ -8,7 +8,7 @@ with open(os.path.join(directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name = "imaplar",
-    version = imaplar.version.version,
+    version = imaplar.shell.version,
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP mailbox monitor",
@@ -22,9 +22,12 @@ setuptools.setup(
     url = "https://github.com/MichaelPaddon/imaplar",
     license = "GPLv3+",
     keywords = "imap",
-    packages = setuptools.find_packages(),
-    python_requires = ">=3.5",
+    packages = setuptools.find_namespace_packages(),
+    zip_safe = False,
+    python_requires = ">=3.7",
     install_requires = [
+        "Cerberus",
+        "PyYaml",
         "imapclient",
         "tenacity"
     ],
