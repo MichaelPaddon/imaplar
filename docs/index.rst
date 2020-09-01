@@ -38,13 +38,18 @@ Server Configuration
 The ``servers`` directory defines how to connect to and monitor
 an IMAP server::
 
-  servers:                            -- required dictionary
-    <hostname>:                       -- the IMAP server
-      port: <port number>             -- default 143 (993 if TLS is enabled)
-      tls:                            -- optional dictionary
-        mode: <mode>                  -- "enabled" (default), "disabled" or "starttls"
-      authentication:                 -- optional dictionary
-        method: login                 -- "login", "plain" or "oauth2"
+  servers:                            -- required server configuration
+    <hostname>:                       -- IMAP server name
+      port: <port>                    -- port number, default 143 (993 when TLS enabled)
+      tls:                            -- optional TLS configuration
+        mode: <mode>                  -- TLS operation ["disabled", "enabled" (default), "starttls"]
+        verify_mode: <verify_mode>    -- cert verification ["none", "optional", "required" (default)]
+        check_hostname: <boolean>     -- validate server name, default True
+        cafile: <cafile>              -- file of concatenated PEM certificates
+        capath: <capath>              -- directory containing PEM certificates
+        cadata: <cadata>              -- concatenated PEM certificates
+      authentication:                 -- optional authentication configuration
+        method: login                 -- authentication type ["login", "plain", "oauth2"]
         username: <username>          -- required for "login"
         password: <password>          -- required for "login" or "plain"
         identity: <identity>          -- required for "plain"
@@ -53,8 +58,8 @@ an IMAP server::
         access_token: <access_token>  -- required for "oauth2"
         mech: <mech>                  -- optional for "oauth2"
         vendor: <vendor>              -- optional for "oauth2"
-      poll: <seconds>                 -- polling interval
-      mailboxes:                      -- required
+      poll: <seconds>                 -- mailbox polling period
+      mailboxes:                      -- required mailbox configuration
         <mailbox>: <policy>           -- mailbox to policy mapping
 
 .. note::
@@ -65,7 +70,7 @@ Policy Configuration
 
 The ``policies`` directory defines how messages are handled::
 
-  policies:                           -- required dictionary
+  policies:                           -- required policies configuration
     <policy>: |                       -- policy name
       <python script>                 -- arbitrary code
 
