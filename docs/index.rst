@@ -80,7 +80,7 @@ newly arrived unseen message in each monitored mailbox.
 
 The following global variables are provided to the script:
 
-* **client**: an instance of `imapclient.IMAPCLient
+* **client**: an instance of `imapclient.IMAPClient
   <https://imapclient.readthedocs.io/en/2.1.0/api.html>`_,
   connected to the server
 * **mailbox**: the name of the monitored mailbox
