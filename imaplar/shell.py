@@ -17,10 +17,13 @@ import yaml
 from . import imap
 from . import schema
 
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
 class ConfigurationError(Exception):
     pass
-
-version = "0.6"
 
 tls_modes = {
     "disabled": imap.TLSMode.DISABLED,
@@ -57,7 +60,7 @@ def main(argv = sys.argv):
         default = os.path.expanduser("~/.imaplar"),
         help = "configuration file (default: '~/.imaplar')")
     parser.add_argument("--version", action = "version",
-        version = version)
+        version = metadata.version("imaplar"))
     parser.add_argument("servers", metavar = "server", nargs="+",
         help = "IMAP server")
     args = parser.parse_args(args = argv[1:])
