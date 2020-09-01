@@ -7,6 +7,9 @@ import ssl
 import tenacity
 import time
 
+class ConnectionError(Exception):
+    pass
+
 class TLSMode(enum.Enum):
     DISABLED = 0
     ENABLED = 1
@@ -118,7 +121,7 @@ class Session:
                 if any([x for x in response[1] if x[1] == b"EXISTS"]):
                     return response[1]
             else:
-                raise imapclient.IMAPClientAbortError("connection dropped")
+                raise ConnectionError("connection dropped")
             time.sleep(poll)
 
     def _wait_idle(self, client):
@@ -130,4 +133,4 @@ class Session:
                     client.idle_done()
                     return response[1:]
             else:
-                raise imapclient.IMAPClientAbortError("connection dropped")
+                raise ConnectionError("connection dropped")
