@@ -51,7 +51,8 @@ class Session:
     tls_mode: TLSMode = TLSMode.ENABLED
     ssl_context: ssl.SSLContext = None
     authenticator: collections.abc.Callable = None
-    poll: float = 0
+    poll: float = 60
+    idle: float = 900
     mailbox: str = "inbox"
     policy: collections.abc.Callable = None
 
@@ -85,8 +86,7 @@ class Session:
         has_move = b"MOVE" in capabilities
 
         # choose wait mechanism
-        wait = self._wait_idle if has_idle and self.poll <= 0\
-            else self._wait_poll
+        wait = self._wait_idle if has_idle else self._wait_poll
 
         # process unseen messages
         client.select_folder(self.mailbox, readonly = True)
@@ -114,23 +114,29 @@ class Session:
             exec(self.policy, namespace)
 
     def _wait_poll(self, client):
-        poll = self.poll if self.poll > 0 else 60
         while True:
             response = client.noop()
             if response:
                 if any([x for x in response[1] if x[1] == b"EXISTS"]):
-                    return response[1]
+                    return
             else:
                 raise ConnectionError("connection dropped")
-            time.sleep(poll)
+
+            time.sleep(self.poll)
 
     def _wait_idle(self, client):
+        alarm = time.time() + self.idle
         client.idle()
         while True:
-            response = client.idle_check()
+            now = time.time()
+            if now >= alarm:
+                client.idle_done()
+                return
+
+            response = client.idle_check(alarm - now)
             if response:
                 if any([x for x in response if x[1] == b"EXISTS"]):
                     client.idle_done()
-                    return response[1:]
+                    return
             else:
                 raise ConnectionError("connection dropped")

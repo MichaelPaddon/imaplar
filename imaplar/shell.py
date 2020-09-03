@@ -132,7 +132,8 @@ def main(argv = sys.argv):
                     "{}: policy not defined".format(policy))
             sessions.append(imap.Session(server, port,
                 tls_mode, ssl_context, authenticator,
-                server_config["poll"], mailbox, policies[policy]))
+                server_config["poll"], server_config["idle"],
+                mailbox, policies[policy]))
 
     # run sessions
     for session in sessions:

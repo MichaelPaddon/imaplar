@@ -123,7 +123,12 @@ config = {
                 "poll": {
                     "type": "integer",
                     "min": 0,
-                    "default": 0
+                    "default": 60
+                },
+                "idle": {
+                    "type": "integer",
+                    "min": 0,
+                    "default": 900
                 },
                 "mailboxes": {
                     "type": "dict",
