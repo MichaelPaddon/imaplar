@@ -65,9 +65,6 @@ def main(argv = sys.argv):
         help = "IMAP server")
     args = parser.parse_args(args = argv[1:])
 
-    with open(args.config) as stream:
-        config = yaml.load(stream)
-
     # read configuration
     validator = cerberus.Validator(schema.config)
     with open(args.config) as stream:
