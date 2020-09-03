@@ -129,7 +129,30 @@ A simple example configuration file looks like this::
     formatters:
       timestamp:
         format: "%(asctime)s %(levelname)s %(message)s"
-    
+
+Systemd User Service (Optional)
+===============================
+
+If you are running Systemd, you may configure a user service in order to run
+*imaplar* automatically.
+
+1. Create the file ``~/.config/systemd/imaplar.server``::
+
+     [Unit]
+     Description = Imaplar IMAP monitoring service
+
+     [Service]
+     ExecStart = <path-to-imap-command>
+     Restart = always
+
+     [Install]
+     WantedBy = default.target
+
+2. Enable and start the service::
+
+     $ systemctl --user enable imaplar
+     $ systemctl --user start imaplar
+
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
    were ancient Roman guardian deities.
