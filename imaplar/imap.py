@@ -90,7 +90,7 @@ class Session:
 
         # process unseen messages
         client.select_folder(self.mailbox, readonly = True)
-        msgids = client.search("UNSEEN")
+        msgids = client.search(["UNSEEN"])
         for msgid in msgids:
             self._process(client, msgid)
 
@@ -99,7 +99,7 @@ class Session:
         while True:
             client.select_folder(self.mailbox, readonly = True)
             wait(client)
-            msgids = client.search("{}:* UNSEEN".format(nextid))
+            msgids = client.search(["{}:*", "UNSEEN"].format(nextid))
             for msgid in msgids:
                 self._process(client, msgid)
             nextid = msgids[-1] + 1 if msgids else nextid
