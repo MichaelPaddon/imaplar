@@ -9,13 +9,14 @@ Synopsis
 ========
 **imaplar**
 [**--config** *path*]
-*server...*
+[*server...*]
 
 **--config** *path*
   Read the specified configuration file.
 
 *server*
-  IMAP server to monitor.
+  IMAP server to monitor. If no servers are specified, then servers
+  marked as default in the configuration will be monitored.
 
 Configuration
 =============
@@ -38,18 +39,19 @@ Server Configuration
 The ``servers`` directory defines how to connect to and monitor
 an IMAP server::
 
-  servers:                            -- required server configuration
-    <hostname>:                       -- IMAP server name
-      port: <port>                    -- port number, default 143 (993 when TLS enabled)
-      tls:                            -- optional TLS configuration
-        mode: <mode>                  -- TLS operation ["disabled", "enabled" (default), "starttls"]
-        verify_mode: <verify_mode>    -- cert verification ["none", "optional", "required" (default)]
-        check_hostname: <boolean>     -- validate server name, default True
-        cafile: <cafile>              -- file of concatenated PEM certificates
-        capath: <capath>              -- directory containing PEM certificates
-        cadata: <cadata>              -- concatenated PEM certificates
-      authentication:                 -- optional authentication configuration
-        method: login                 -- authentication type ["login", "plain", "oauth2"]
+  servers:                            -- server configuration (required)
+    <hostname>:                       -- IMAP server name (required)
+      default: <boolean>              -- default server (False)
+      port: <port>                    -- port number (143, or 993 when TLS enabled)
+      tls:                            -- TLS configuration (optional)
+        mode: <mode>                  -- TLS mode: "disabled", "enabled", "starttls" ("enabled")
+        verify_mode: <verify_mode>    -- verify cert: "none", "optional", "required" ("required")
+        check_hostname: <boolean>     -- validate server name (True)
+        cafile: <cafile>              -- file of PEM certificates (optional)
+        capath: <capath>              -- directory of PEM certificates (optional)
+        cadata: <cadata>              -- literal PEM certificates (optional)
+      authentication:                 -- authentication configuration (optional)
+        method: login                 -- auth type: "login", "plain", "oauth2"
         username: <username>          -- required for "login"
         password: <password>          -- required for "login" or "plain"
         identity: <identity>          -- required for "plain"
@@ -58,8 +60,8 @@ an IMAP server::
         access_token: <access_token>  -- required for "oauth2"
         mech: <mech>                  -- optional for "oauth2"
         vendor: <vendor>              -- optional for "oauth2"
-      poll: <seconds>                 -- mailbox polling period
-      mailboxes:                      -- required mailbox configuration
+      poll: <seconds>                 -- mailbox polling period (0)
+      mailboxes:                      -- mailbox configuration (required)
         <mailbox>: <policy>           -- mailbox to policy mapping
 
 .. note::
@@ -70,9 +72,9 @@ Policy Configuration
 
 The ``policies`` directory defines how messages are handled::
 
-  policies:                           -- required policies configuration
-    <policy>: |                       -- policy name
-      <python script>                 -- arbitrary code
+  policies:                           -- policy configuration (required)
+    <policy>: |                       -- policy name (required)
+      <python script>                 -- arbitrary code (required)
 
 On connecting to a server, the python script is executed
 first for every existing unseen message, and subsequently for every
