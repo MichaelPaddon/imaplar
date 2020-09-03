@@ -111,6 +111,10 @@ config = {
                         }
                     }
                 },
+                "default": {
+                    "type": "boolean",
+                    "default": False
+                },
                 "port": {
                     "type": "integer",
                     "min": 1,

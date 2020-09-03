@@ -61,7 +61,7 @@ def main(argv = sys.argv):
         help = "configuration file (default: '~/.imaplar')")
     parser.add_argument("--version", action = "version",
         version = metadata.version("imaplar"))
-    parser.add_argument("servers", metavar = "server", nargs="+",
+    parser.add_argument("servers", metavar = "server", nargs="*",
         help = "IMAP server")
     args = parser.parse_args(args = argv[1:])
 
@@ -84,9 +84,13 @@ def main(argv = sys.argv):
         (name, compile(code, "<policy_{}>".format(name), "exec"))
             for name, code in config["policies"].items())
 
+    # monitored servers
+    servers = args.servers if args.servers\
+        else [k for k, v in config["servers"].items() if v["default"]]
+
     # configure sessions 
     sessions = []
-    for server in args.servers:
+    for server in servers:
         # server configuration
         server_config = config["servers"].get(server, None)
         if not server_config:
