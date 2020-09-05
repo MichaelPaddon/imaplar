@@ -128,18 +128,18 @@ class Session:
             time.sleep(self.poll)
 
     def _wait_idle(self, client):
-        alarm = time.time() + self.idle
+        now = time.time()
+        alarm = now + self.idle
         client.idle()
         while True:
-            now = time.time()
-            if now >= alarm:
-                client.idle_done()
-                return
-
             response = client.idle_check(alarm - now)
             if response:
                 if any([x for x in response if x[1] == b"EXISTS"]):
                     client.idle_done()
                     return
-            else:
-                raise ConnectionError("connection dropped")
+
+            now = time.time()
+            if now >= alarm:
+                alarm = now + self.idle
+                client.idle_done()
+                client.idle()
