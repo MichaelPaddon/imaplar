@@ -55,6 +55,7 @@ class Session:
     idle: float = 900
     mailbox: str = "inbox"
     policy: collections.abc.Callable = None
+    parameters: collections.abc.Mapping = None
 
     @tenacity.retry(
             wait = tenacity.wait_exponential(max = 300),
@@ -90,26 +91,28 @@ class Session:
 
         # process unseen messages
         client.select_folder(self.mailbox, readonly = True)
-        msgids = client.search(["UNSEEN"])
-        for msgid in msgids:
-            self._process(client, msgid)
+        messages = client.search(["UNSEEN"])
+        for message in messages:
+            self._process(client, message)
 
         # process incoming messages
-        nextid = msgids[-1] + 1 if msgids else 1
+        next_message = max(messages) + 1 if messages else 1
         while True:
             client.select_folder(self.mailbox, readonly = True)
             wait(client)
-            msgids = client.search(["{}:*", "UNSEEN"].format(nextid))
-            for msgid in msgids:
-                self._process(client, msgid)
-            nextid = msgids[-1] + 1 if msgids else nextid
+            messages = client.search(["{}:*", "UNSEEN"].format(next_message))
+            for message in messages:
+                self._process(client, message)
+            if messages:
+                next_message = max(messages) + 1
 
-    def _process(self, client, msgid):
+    def _process(self, client, message):
         if self.policy:
             namespace = {
                 "client": client,
                 "mailbox": self.mailbox,
-                "msgid": msgid
+                "message": message,
+                "parameters": dict(self.parameters) if self.parameters else {}
             }
             exec(self.policy, namespace)
 

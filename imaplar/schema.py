@@ -140,6 +140,9 @@ config = {
                         "type": "string",
                         "empty": False
                     }
+                },
+                "parameters": {
+                    "type": "dict",
                 }
             }
         }

@@ -60,9 +60,12 @@ an IMAP server::
         access_token: <access_token>  -- required for "oauth2"
         mech: <mech>                  -- optional for "oauth2"
         vendor: <vendor>              -- optional for "oauth2"
-      poll: <seconds>                 -- mailbox polling period (0)
+      idle: <seconds>                 -- mailbox idle period (900)
+      poll: <seconds>                 -- mailbox polling period (60)
       mailboxes:                      -- mailbox configuration (required)
         <mailbox>: <policy>           -- mailbox to policy mapping
+      parameters:                     -- optional policy parameters
+        ...                           -- user defined parameters
 
 .. note::
    A server is only actually monitored if it is named on the command line.
@@ -86,7 +89,8 @@ The following global variables are provided to the script:
   <https://imapclient.readthedocs.io/en/2.1.0/api.html>`_,
   connected to the server
 * **mailbox**: the name of the monitored mailbox
-* **msgid**: the id of the message to process
+* **message**: the message id
+* **parameters**: server specific parameters (if any)
 
 .. note::
    A policy script should *not* assume that the currently selected
