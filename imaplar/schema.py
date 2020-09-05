@@ -49,61 +49,65 @@ config = {
                                 {
                                     "allowed": ["login"],
                                     "dependencies": [
-                                        "username",
-                                        "password"
+                                        "login_username",
+                                        "login_password"
                                     ]
                                 },
                                 {
                                     "allowed": ["plain"],
                                     "dependencies": [
-                                        "identity",
-                                        "password",
-                                        "authorization_identity"
+                                        "plain_identity",
+                                        "plain_password",
+                                        "plain_authorization_identity"
                                     ]
                                 },
                                 {
                                     "allowed": ["oauth2"],
                                     "dependencies": [
-                                        "user",
-                                        "access_token",
-                                        "mech",
-                                        "vendor"
+                                        "oauth2_user",
+                                        "oauth2_access_token",
+                                        "oauth2_mech",
+                                        "oauth2_vendor"
                                     ]
                                 },
                             ]
                         },
-                        "username": {
+                        "login_username": {
                             "type": "string",
                             "empty": False,
                         },
-                        "password": {
+                        "login_password": {
                             "type": "string",
                             "empty": False,
                         },
-                        "identity": {
+                        "plain_identity": {
                             "type": "string",
                             "empty": False,
                         },
-                        "authorization_identity": {
+                        "plain_password": {
+                            "type": "string",
+                            "empty": False,
+                        },
+                        "plain_authorization_identity": {
                             "type": "string",
                             "empty": False,
                             "nullable": True,
                             "default": None
                         },
-                        "user": {
+                        "oauth2_user": {
                             "type": "string",
                             "empty": False,
                         },
-                        "access_token": {
+                        "oauth2_access_token": {
                             "type": "string",
                             "empty": False,
                         },
-                        "mech": {
+                        "oauth2_mech": {
                             "type": "string",
                             "empty": False,
                             "default": "XOAUTH2"
                         },
-                        "vendor": {
+                        "oauth2_vendor": {
                             "type": "string",
                             "empty": False,
                             "nullable": True,

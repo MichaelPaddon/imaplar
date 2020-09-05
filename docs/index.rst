@@ -39,33 +39,34 @@ Server Configuration
 The ``servers`` directory defines how to connect to and monitor
 an IMAP server::
 
-  servers:                            -- server configuration (required)
-    <hostname>:                       -- IMAP server name (required)
-      default: <boolean>              -- default server (False)
-      port: <port>                    -- port number (143, or 993 when TLS enabled)
-      tls:                            -- TLS configuration (optional)
-        mode: <mode>                  -- TLS mode: "disabled", "enabled", "starttls" ("enabled")
-        verify_mode: <verify_mode>    -- verify cert: "none", "optional", "required" ("required")
-        check_hostname: <boolean>     -- validate server name (True)
-        cafile: <cafile>              -- file of PEM certificates (optional)
-        capath: <capath>              -- directory of PEM certificates (optional)
-        cadata: <cadata>              -- literal PEM certificates (optional)
-      authentication:                 -- authentication configuration (optional)
-        method: login                 -- auth type: "login", "plain", "oauth2"
-        username: <username>          -- required for "login"
-        password: <password>          -- required for "login" or "plain"
-        identity: <identity>          -- required for "plain"
-        authorization_identity: <x>   -- optional for "plain"
-        user: <user>                  -- required for "oauth2"
-        access_token: <access_token>  -- required for "oauth2"
-        mech: <mech>                  -- optional for "oauth2"
-        vendor: <vendor>              -- optional for "oauth2"
-      idle: <seconds>                 -- mailbox idle period (900)
-      poll: <seconds>                 -- mailbox polling period (60)
-      mailboxes:                      -- mailbox configuration (required)
-        <mailbox>: <policy>           -- mailbox to policy mapping
-      parameters:                     -- optional policy parameters
-        ...                           -- user defined parameters
+  servers:                                 -- server configurations (required)
+    <hostname>:                            -- IMAP server host name (required)
+      default: <boolean>                   -- default server (False)
+      port: <port>                         -- port number (143, or 993 when TLS enabled)
+      tls:                                 -- TLS configuration (optional)
+        mode: <mode>                       -- TLS mode: "disabled", "enabled", "starttls" ("enabled")
+        verify_mode: <verify_mode>         -- verify cert: "none", "optional", "required" ("required")
+        check_hostname: <boolean>          -- validate server name (True)
+        cafile: <cafile>                   -- file of PEM certificates (optional)
+        capath: <capath>                   -- directory of PEM certificates (optional)
+        cadata: <cadata>                   -- literal PEM certificates (optional)
+      authentication:                      -- authentication configuration (optional)
+        method: <method>                   -- auth type: "login", "plain", "oauth2" (required)
+        login_username: <username>         -- username (required for login)
+        login_password: <password>         -- password (required for login)
+        plain_identity: <identity>         -- identity (required for plain)
+        plain_password: <password>         -- password (required for plain)
+        plain_authorization_identity: <x>  -- authorization identity (required for plain)
+        oauth2_user: <user>                -- user (required for oauth2)
+        oauth2_access_token: <token>       -- access_token (required for oauth2)
+        oauth2_mech: <mech>                -- mechanism ("XOAUTH2")
+        oauth2_vendor: <vendor>            -- vendor (optional for "oauth2")
+      poll: <seconds>                      -- mailbox polling period (60)
+      idle: <seconds>                      -- mailbox idle period (900)
+      mailboxes:                           -- mailbox configuration (required)
+        <mailbox>: <policy>                -- mailbox to policy mapping
+      parameters:                          -- per-server policy parameters (optional)
+        ...                                -- user defined parameters (required)
 
 .. note::
    A server is only actually monitored if it is named on the command line.

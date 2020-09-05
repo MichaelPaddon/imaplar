@@ -39,17 +39,17 @@ ssl_verify_modes = {
 
 auth_factories = {
     "login": lambda config: imap.LoginAuthenticator(
-                    config["username"],
-                    config["password"]),
+                    config["login_username"],
+                    config["login_password"]),
     "plain": lambda config: imap.PlainAuthenticator(
-                    config["identity"],
-                    config["password"],
-                    config["authorization_identity"]),
+                    config["plain_identity"],
+                    config["plain_password"],
+                    config["plain_authorization_identity"]),
     "oauth2": lambda config: imap.OAuth2Authenticator(
-                    config["user"],
-                    config["access_token"],
-                    config["mech"],
-                    config["vendor"])
+                    config["oauth2_user"],
+                    config["oauth2_access_token"],
+                    config["oauth2_mech"],
+                    config["oauth2_vendor"])
 }
 
 def main(argv = sys.argv):
