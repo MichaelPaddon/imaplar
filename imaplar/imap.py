@@ -6,6 +6,7 @@ import logging
 import ssl
 import tenacity
 import time
+from . import policy
 
 class ConnectionError(Exception):
     pass
@@ -112,7 +113,8 @@ class Session:
                 "client": client,
                 "mailbox": self.mailbox,
                 "message": message,
-                "parameters": dict(self.parameters) if self.parameters else {}
+                "parameters": dict(self.parameters) if self.parameters else {},
+                "policy": policy
             }
             exec(self.policy, namespace)
 
