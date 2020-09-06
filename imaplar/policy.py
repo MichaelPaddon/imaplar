@@ -1,3 +1,4 @@
+import email.utils
 import functools
 import itertools
 
@@ -27,7 +28,9 @@ class OrQuery(list):
 
 class AddressQuery(OrQuery):
     def __init__(self, keys, addresses):
-        super().__init__(k + [str(a)] for k in keys for a in addresses)
+        addresses = list(filter(None,
+            (email.utils.parseaddr(str(a))[1] for a in addresses)))
+        super().__init__(k + [a] for k in keys for a in addresses)
 
 class OriginatorAddressQuery(AddressQuery):
     def __init__(self, addresses):
