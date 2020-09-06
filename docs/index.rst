@@ -5,6 +5,9 @@ Imaplar
 Unseen and incoming messages are passed to a user defined policy for
 processing.
 
+.. toctree::
+  :caption: Table of Contents:
+
 Synopsis
 ========
 **imaplar**
