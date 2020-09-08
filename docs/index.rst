@@ -163,6 +163,11 @@ If you are running Systemd, you may configure a user service in order to run
      $ systemctl --user enable imaplar
      $ systemctl --user start imaplar
 
+3. (Optional) If you want the service to keep running when you are logged out,
+run the following command as root::
+
+     # loginctl enable-linger <your-username>
+
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
    were ancient Roman guardian deities.
