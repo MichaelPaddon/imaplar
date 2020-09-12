@@ -113,8 +113,7 @@ class Session:
                 "client": client,
                 "mailbox": self.mailbox,
                 "message": message,
-                "parameters": dict(self.parameters) if self.parameters else {},
-                "policy": policy
+                "parameters": dict(self.parameters) if self.parameters else {}
             }
             exec(self.policy, namespace)
 
