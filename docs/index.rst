@@ -5,8 +5,7 @@ Imaplar
 Unseen and incoming messages are passed to a user defined policy for
 processing.
 
-.. toctree::
-  :caption: Table of Contents:
+.. contents:: Table of Contents
 
 Synopsis
 ========
@@ -87,19 +86,6 @@ On connecting to a server, the python script is executed
 first for every existing unseen message, and subsequently for every
 newly arrived unseen message in each monitored mailbox.
 
-The following global variables are provided to the script:
-
-* **client**: an instance of `imapclient.IMAPClient
-  <https://imapclient.readthedocs.io/en/2.1.0/api.html>`_,
-  connected to the server
-* **mailbox**: the name of the monitored mailbox
-* **message**: the message id
-* **parameters**: server specific parameters (if any)
-
-.. note::
-   A policy script should *not* assume that the currently selected
-   mailbox (if any) is the monitored mailbox.
-
 Logging Configuration
 ---------------------
 
@@ -123,7 +109,7 @@ A simple example configuration file looks like this::
 
   policies:
     mypolicy: |
-      # this is a python script
+      # this policy does nothing
       pass
 
   logging:
@@ -141,7 +127,7 @@ A simple example configuration file looks like this::
         format: "%(asctime)s %(levelname)s %(message)s"
 
 Systemd User Service (Optional)
-===============================
+-------------------------------
 
 If you are running Systemd, you may configure a user service in order to run
 *imaplar* automatically.
@@ -163,10 +149,33 @@ If you are running Systemd, you may configure a user service in order to run
      $ systemctl --user enable imaplar
      $ systemctl --user start imaplar
 
-3. (Optional) If you want the service to keep running when you are logged out,
-run the following command as root::
+3. (Optional) If you want the service to keep running when you are logged out, run the following command as root::
 
      # loginctl enable-linger <your-username>
+
+Writing Policies
+================
+
+Each policy is a python script. The following global variables are provided:
+
+* **client**: an instance of `imapclient.IMAPClient
+  <https://imapclient.readthedocs.io/en/2.1.0/api.html>`_,
+  connected to the server
+* **mailbox**: the name of the monitored mailbox
+* **message**: the message id
+* **parameters**: server specific parameters from the configuration (if any)
+
+.. note::
+   A policy script should *not* assume that the currently selected
+   mailbox (if any) is the monitored mailbox.
+
+The imaplar.policy module
+-------------------------
+
+.. automodule:: imaplar.policy
+   :members:
+   :member-order: bysource
+   :show-inheritance:
 
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
