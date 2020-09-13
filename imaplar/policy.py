@@ -8,20 +8,6 @@ import functools
 import imapclient
 import itertools
 
-def fetch_envelope(client, message):
-    """Fetch the envelope of a message from the currently selected IMAP folder.
-
-    :param client: imap client
-    :param message: message id
-    :type client: imapclient.IMAPClient
-    :type message: int
-    :return: an envelope
-    :rtype: imapclient.response_types.Envelope
-    """
-
-    response = client.fetch([message], ["ENVELOPE"])
-    return response[message][b"ENVELOPE"]
-
 class Originators(set):
     """Envelope originator addresses.
 
@@ -158,3 +144,36 @@ class RecipientQuery(OrQuery):
             ToQuery(addresses),
             CcQuery(addresses),
             BccQuery(addresses)])
+
+def fetch_envelope(client, mailbox, message):
+    """Fetch the envelope of a message.
+
+    :param client: imap client
+    :param mailbox: mailbox name
+    :param message: message id
+    :type client: imapclient.IMAPClient
+    :type mailbox: string
+    :type message: int
+    :return: an envelope
+    :rtype: imapclient.response_types.Envelope
+    """
+
+    client.select_folder(mailbox, readonly = True)
+    response = client.fetch([message], ["ENVELOPE"])
+    return response[message][b"ENVELOPE"]
+
+def search_mailbox(client, mailbox, query):
+    """Search a mailbox.
+
+    :param client: imap client
+    :param mailbox: mailbox name
+    :param query: search criteria
+    :type client: imapclient.IMAPClient
+    :type mailbox: string
+    :type query: list of query terms
+    :return: message ids
+    :rtype: list
+    """
+
+    client.select_folder(mailbox, readonly = True)
+    return client.search(query)
