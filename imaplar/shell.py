@@ -16,11 +16,7 @@ import threading
 import yaml
 from . import client
 from . import schema
-
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
+from . import version
 
 class ConfigurationError(Exception):
     pass
@@ -60,7 +56,7 @@ def main(argv = sys.argv):
         default = os.path.expanduser("~/.imaplar"),
         help = "configuration file (default: '~/.imaplar')")
     parser.add_argument("--version", action = "version",
-        version = metadata.version("imaplar"))
+        version = version.version())
     parser.add_argument("servers", metavar = "server", nargs="*",
         help = "IMAP server")
     args = parser.parse_args(args = argv[1:])
