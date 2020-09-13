@@ -14,7 +14,7 @@ import ssl
 import sys
 import threading
 import yaml
-from . import imap
+from . import client
 from . import schema
 
 try:
@@ -26,9 +26,9 @@ class ConfigurationError(Exception):
     pass
 
 tls_modes = {
-    "disabled": imap.TLSMode.DISABLED,
-    "enabled": imap.TLSMode.ENABLED,
-    "starttls": imap.TLSMode.STARTTLS,
+    "disabled": client.TLSMode.DISABLED,
+    "enabled": client.TLSMode.ENABLED,
+    "starttls": client.TLSMode.STARTTLS,
 }
 
 ssl_verify_modes = {
@@ -38,14 +38,14 @@ ssl_verify_modes = {
 }
 
 auth_factories = {
-    "login": lambda config: imap.LoginAuthenticator(
+    "login": lambda config: client.LoginAuthenticator(
                     config["login_username"],
                     config["login_password"]),
-    "plain": lambda config: imap.PlainAuthenticator(
+    "plain": lambda config: client.PlainAuthenticator(
                     config["plain_identity"],
                     config["plain_password"],
                     config["plain_authorization_identity"]),
-    "oauth2": lambda config: imap.OAuth2Authenticator(
+    "oauth2": lambda config: client.OAuth2Authenticator(
                     config["oauth2_user"],
                     config["oauth2_access_token"],
                     config["oauth2_mech"],
@@ -94,12 +94,12 @@ def main(argv = sys.argv):
             raise ConfigurationError("{}: unknown server".format(server))
 
         # tls configuration
-        tls_mode = imap.TLSMode.ENABLED
+        tls_mode = client.TLSMode.ENABLED
         ssl_context = None
         tls_config = server_config.get("tls", None)
         if tls_config:
             tls_mode = tls_modes[tls_config["mode"]]
-            if tls_mode != imap.TLSMode.DISABLED:
+            if tls_mode != client.TLSMode.DISABLED:
                 ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS)
 
                 verify_mode = tls_config.get("verify_mode", None)
@@ -124,13 +124,13 @@ def main(argv = sys.argv):
         
         # port configuration
         port = server_config.get("port",
-            993 if tls_mode == imap.TLSMode.ENABLED else 143)
+            993 if tls_mode == client.TLSMode.ENABLED else 143)
 
         for mailbox, policy in server_config["mailboxes"].items():
             if policy not in policies:
                 raise ConfigurationError(
                     "{}: policy not defined".format(policy))
-            sessions.append(imap.Session(server, port,
+            sessions.append(client.Session(server, port,
                 tls_mode, ssl_context, authenticator,
                 server_config["poll"], server_config["idle"],
                 mailbox, policies[policy]))
