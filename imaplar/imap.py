@@ -60,7 +60,7 @@ class Session:
 
     @tenacity.retry(
             wait = tenacity.wait_exponential(max = 300),
-            after = tenacity.after_log(logging.getLogger(), logging.ERROR))
+            after = tenacity.after_log(logging.getLogger(), logging.WARN))
     def run_forever(self):
         try:
             self.run()
@@ -115,7 +115,13 @@ class Session:
                 "message": message,
                 "parameters": dict(self.parameters) if self.parameters else {}
             }
-            exec(self.policy, namespace)
+
+            logging.info("processing {}/{}/{}".format(
+                self.host, self.mailbox, message))
+            try:
+                exec(self.policy, namespace)
+            except Exception as e:
+                logging.exception("policy exception")
 
     def _wait_poll(self, client):
         while True:
