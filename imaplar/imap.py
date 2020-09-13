@@ -6,7 +6,6 @@ import logging
 import ssl
 import tenacity
 import time
-from . import policy
 
 class ConnectionError(Exception):
     pass
