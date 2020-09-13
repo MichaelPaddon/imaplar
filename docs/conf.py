@@ -26,11 +26,12 @@ project = 'Imaplar'
 copyright = '2020, Michael Paddon'
 author = 'Michael Paddon'
 
-import imaplar.version
+#import imaplar.version
 # The short X.Y version
-version = imaplar.version.version()
-# The full version, including alpha/beta/rc tags
-release = imaplar.version.version()
+#version = imaplar.version.version()
+#release = imaplar.version.version()
+version = "0.8"
+release = "0.8"
 
 
 # -- General configuration ---------------------------------------------------
