@@ -122,6 +122,9 @@ def main(argv = sys.argv):
         port = server_config.get("port",
             993 if tls_mode == client.TLSMode.ENABLED else 143)
 
+        # server specific parameters
+        parameters = server_config.get("parameters", {})
+
         for mailbox, policy in server_config["mailboxes"].items():
             if policy not in policies:
                 raise ConfigurationError(
@@ -129,7 +132,7 @@ def main(argv = sys.argv):
             sessions.append(client.Session(server, port,
                 tls_mode, ssl_context, authenticator,
                 server_config["poll"], server_config["idle"],
-                mailbox, policies[policy]))
+                mailbox, policies[policy], parameters))
 
     # run sessions
     for session in sessions:
