@@ -5,8 +5,6 @@ Imaplar
 Unseen and incoming messages are passed to a user defined policy for
 processing.
 
-.. contents:: Table of Contents
-
 Synopsis
 ========
 **imaplar**
@@ -180,3 +178,8 @@ The imaplar.policy module
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
    were ancient Roman guardian deities.
+
+.. toctree::
+   :hidden:
+
+   index
