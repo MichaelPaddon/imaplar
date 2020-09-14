@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-import imaplar.version
+#import imaplar.version
 
 project = 'Imaplar'
 copyright = '2020, Michael Paddon'
