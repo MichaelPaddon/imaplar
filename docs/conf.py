@@ -30,8 +30,8 @@ author = 'Michael Paddon'
 # The short X.Y version
 #version = imaplar.version.version()
 #release = imaplar.version.version()
-version = "0.9"
-release = "0.9"
+version = "0.9.1"
+release = "0.9.1"
 
 
 # -- General configuration ---------------------------------------------------
