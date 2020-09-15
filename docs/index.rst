@@ -26,6 +26,16 @@ Synopsis
   IMAP server to monitor. If no servers are specified, then servers
   marked as default in the configuration will be monitored.
 
+Installation
+============
+
+Imaplar is `released on PyPI <https://pypi.org/project/imaplar/>`_,
+so all you need to do is:
+
+.. code-block:: sh
+
+   pip3 install imaplar
+
 Configuration
 =============
 
