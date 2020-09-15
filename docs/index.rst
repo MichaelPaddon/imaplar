@@ -8,10 +8,10 @@ Unseen messages are passed to a user defined policy for processing.
 
 1. Startup. Each mailbox, on each monitored server, is examined for
    unseen messages.
-   Each such message is passed to its mailbox's policy for processing.
+   Each unseen message is passed to the policy associated with its mailbox.
 
 2. Ongoing. Each mailbox is watched for the arrival of new unseen messages.
-   Each such message is passed to its mailbox's policy.
+   Each new message is passed to its mailbox's policy.
 
 Synopsis
 ========
@@ -33,8 +33,10 @@ Configuration
 by default the ``~/.imaplar`` file.
 This can be overridden on the command line.
 
-.. note::
-   You must supply a configuration for *imaplar* to do anything useful.
+.. caution::
+   The configuration file contains authentication secrets
+   and code which will be executed.
+   It should be readable and writable only by its owner.
 
 The configuration file defines a dictionary with the following members:
 
@@ -50,19 +52,11 @@ The configuration file defines a dictionary with the following members:
   `python logging configuration mechanism
   <https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema>`_.
 
-.. caution::
-   The configuration file contains authentication secrets
-   and code which will be executed.
-   It should be readable and writable only by its owner.
-
 Server Configuration
 --------------------
 
 Each server has an associated configuration dictionary with the
 following members:
-
-The ``servers`` directory defines how to connect to and monitor
-an IMAP server. Each key is a hostname
 
 ``default`` [boolean, default = False]
   A server flagged as default will be monitored if
@@ -129,7 +123,7 @@ A TLS configuration  dictionary has the following members:
 Authentication Configuration
 ############################
 
-An authetication configuration dictionary has the follwoing members:
+An authetication configuration dictionary has the following members:
 
 ``method`` [string, required]
   The authentication method to use.
