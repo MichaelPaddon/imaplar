@@ -187,7 +187,7 @@ A simple example configuration file looks like this:
     mypolicy: |
       # this policy just logs a message
       import logging
-      logging.info("Handled {}/{}/{}".format(mailbox, message))
+      logging.info("Handled {}/{}".format(mailbox, message))
 
 Systemd User Service (Optional)
 -------------------------------
