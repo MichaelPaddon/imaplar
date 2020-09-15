@@ -164,7 +164,10 @@ An authetication configuration dictionary has the follwoing members:
 
 Example Configuration
 ---------------------
-A simple example configuration file looks like this::
+
+A simple example configuration file looks like this:
+
+.. code-block:: YAML
 
   ---
   servers:
@@ -188,7 +191,9 @@ Systemd User Service (Optional)
 If you are running Systemd, you may configure a user service in order to run
 *imaplar* automatically.
 
-1. Create the file ``~/.config/systemd/imaplar.server``::
+1. Create the file ``~/.config/systemd/imaplar.server``:
+
+   .. code-block:: INI
 
      [Unit]
      Description = Imaplar IMAP monitoring service
@@ -200,14 +205,18 @@ If you are running Systemd, you may configure a user service in order to run
      [Install]
      WantedBy = default.target
 
-2. Enable and start the service::
+2. Enable and start the service with these shell commands:
 
-     $ systemctl --user enable imaplar
-     $ systemctl --user start imaplar
+   .. code-block:: sh
 
-3. If you want the service to keep running when you are logged out, run the following command as root::
+     systemctl --user enable imaplar
+     systemctl --user start imaplar
 
-     # loginctl enable-linger <your-username>
+3. If you want the service to keep running when you are logged out, run the following command as root:
+
+   .. code-block:: sh
+
+     loginctl enable-linger <your-username>
 
 Writing Policies
 ================
