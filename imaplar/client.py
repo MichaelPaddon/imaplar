@@ -100,7 +100,7 @@ class Session:
         while True:
             client.select_folder(self.mailbox, readonly = True)
             wait(client)
-            messages = client.search(["{}:*", "UNSEEN"].format(next_message))
+            messages = client.search(["{}:*".format(next_message), "UNSEEN"])
             for message in messages:
                 self._process(client, message)
             if messages:
