@@ -2,8 +2,16 @@ Imaplar
 *******
 
 *Imaplar* [#f1]_ monitors one or more mailboxes on one or more IMAP servers.
-Unseen and incoming messages are passed to a user defined policy for
-processing.
+Unseen messages are passed to a user defined policy for processing.
+
+*Imaplar* operates in two phases:
+
+1. Startup. Each mailbox, on each monitored server, is examined for
+   unseen messages.
+   Each such message is passed to its mailbox's policy for processing.
+
+2. Ongoing. Each mailbox is watched for the arrival of new unseen messages.
+   Each such message is passed to its mailbox's policy.
 
 Synopsis
 ========
@@ -22,11 +30,25 @@ Configuration
 =============
 
 *Imaplar* is configured by a `YAML <https://yaml.org>`_ file, 
-by default ``~/.imaplar``.
+by default the ``~/.imaplar`` file.
 This can be overridden on the command line.
 
 .. note::
    You must supply a configuration for *imaplar* to do anything useful.
+
+The configuration file defines a dictionary with the following members:
+
+``servers`` [dictionary, required]
+  A dictionary mapping IMAP server hostnames to server configurations.
+
+``policies`` [dictionary, required]
+  A dictionary mapping policy names to python scripts.
+
+``logging`` [dictionary, optional]
+  A dictionary specifying logging configuration.
+  If present, it is passed to the
+  `python logging configuration mechanism
+  <https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema>`_.
 
 .. caution::
    The configuration file contains authentication secrets
@@ -36,68 +58,117 @@ This can be overridden on the command line.
 Server Configuration
 --------------------
 
+Each server has an associated configuration dictionary with the
+following members:
+
 The ``servers`` directory defines how to connect to and monitor
-an IMAP server. Defaults are shown as literal values::
+an IMAP server. Each key is a hostname
 
-  servers:                                 -- server configurations [required]
-    <hostname>:                            -- IMAP server host name [required]
-      default: False                       -- flagged as a default server
-      port: 993                            -- port number (143 if TLS not enabled)
-      tls:                                 -- TLS configuration [optional]
-        mode: enabled                      -- TLS mode: "disabled", "enabled", "starttls"
-        verify_mode: required              -- verify certificate: "none", "optional", "required"
-        check_hostname: True               -- validate server name
-        cafile: <file>                     -- file of PEM certificates [optional]
-        capath: <directory>                -- directory of PEM certificates [optional]
-        cadata: <cadata>                   -- literal PEM certificates [optional]
-      authentication:                      -- authentication configuration [optional]
-        method: <method>                   -- auth method: "login", "plain", "oauth2" [required]
-        login_username: <username>         -- login username
-        login_password: <password>         -- login password
-        plain_identity: <identity>         -- plain identity
-        plain_password: <password>         -- plain password
-        plain_authorization_identity: <x>  -- plain authorization identity [optional]
-        oauth2_user: <user>                -- oauth2 user
-        oauth2_access_token: <token>       -- oauth2 access token
-        oauth2_mech: XOAUTH2               -- aouth2 mechanism ("XOAUTH2")
-        oauth2_vendor: <vendor>            -- oauth2 vendor [optional]
-      poll: 60                             -- mailbox polling period
-      idle: 900                            -- mailbox idle period
-      mailboxes:                           -- mailbox configurations [required]
-        <mailbox>: <policy>                -- mailbox name mapped to policy name
-      parameters:                          -- per-server policy parameters [optional]
-        ...                                -- user defined parameters
+``default`` [boolean, default = False]
+  A server flagged as default will be monitored if
+  no servers a specified on the command line.
 
-.. note::
-   A server is only actually monitored if it is named on the command line.
+``port`` [integer, default = 993 if TLS is enabled, otherwise 143]
+  The IMAP server port.
 
-Policy Configuration
---------------------
+``tls`` [dictionary, optional]
+  TLS configuration.
 
-The ``policies`` directory defines how messages are handled::
+``authentication`` [dictionary, optional]
+  Authentication configuration.
 
-  policies:                           -- policy configurations [required]
-    <policy>: |                       -- policy name
-      <python script>                 -- policy implementation
+``poll`` [integer, default = 60]
+  Server polling interval in seconds.
+  Only used when IDLE is not supported by the server.
 
-On connecting to a server, the python script is executed
-first for every existing unseen message, and subsequently for every
-newly arrived unseen message in each monitored mailbox.
+``idle`` [integer, default = 900]
+  Server idling interval in seconds.
+  Only used when IDLE is supported by the server.
 
-Logging Configuration
+``mailboxes`` [dictionary, required]
+  A mapping of mailbox names to policy names.
+  Each mailbox will be monitored, with messages passed to the specified policy.
+
+``parameters`` [dictionary, optional]
+  Per-server parameters that will be passed to the policy.
+
+TLS Configuration
+#################
+
+A TLS configuration  dictionary has the following members:
+
+``mode`` [string, default = "enabled"]
+  The TLS mode. This may be "enabled", "disabled" or "starttls".
+
+``verify_mode`` [string, default = "required"]
+  Certificate verification mode. This may be "none", "optional" or "required".
+  Set this to "optional" or "none" if you are using a self signed certificate.
+
+``check_hostname`` [boolean, default = true]
+  Validate that the server name matches the certificate.
+  Set this to false if there is a mismatch (such as connecting to localhost).
+
+``cafile`` [string, optional]
+  The path to a file containing
+  `concatenated PEM certificates
+  <https://docs.python.org/3/library/ssl.html#ssl-certificates>`_.
+  If defined, the system default certificate store is ignored.
+
+``capath`` [string, optional]
+  The path to a directory containing PEM certifcates as per the
+  `OpenSSL layout
+  <https://www.openssl.org/docs/man1.1.1/man3/SSL_CTX_load_verify_locations.html>`_.
+  If defined, the system default certificate store is ignored.
+
+``cadata`` [string, optional]
+  A string containing
+  `concatenated PEM certificates
+  <https://docs.python.org/3/library/ssl.html#ssl-certificates>`_.
+  If defined, the system default certificate store is ignored.
+
+Authentication Configuration
+############################
+
+An authetication configuration dictionary has the follwoing members:
+
+``method`` [string, required]
+  The authentication method to use.
+  Must be one of "login", "plain" or "oauth2".
+
+``login_username`` [string, required when method is "login"]
+  The login username.
+
+``login_password`` [string, required when method is "login"]
+  The login password.
+
+``plain_identity`` [string, required when method is "plain"]
+  The plain identity.
+
+``plain_password`` [string, required when method is "plain"]
+  The plain password.
+
+``plain_authorization_identity`` [string, optional when method is "plain"]
+  The plain authorization identity.
+
+``oauth2_user`` [string, required when method is "oauth2"]
+  The oauth2 user.
+
+``oauth2_access_token`` [string, required when method is "oauth2"]
+  The oauth2 access token.
+
+``oauth2_mech`` [string, default = "XOAUTH2" when method is "oauth2"]
+  The oauth2 mechanism.
+
+``oauth2_vendor`` [string, optional when method is "oauth2"]
+  The oauth2 vendor.
+
+Example Configuration
 ---------------------
-
-If a ``logging`` directory is present, it is passed to the `standard python logging configuration mechanism <https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema>`_.
-
-Example
--------
 A simple example configuration file looks like this::
 
   ---
   servers:
     mail.example.com:
-      tls:
-        mode: starttls
       authentication:
         method: login
         username: myname
@@ -107,22 +178,9 @@ A simple example configuration file looks like this::
 
   policies:
     mypolicy: |
-      # this policy does nothing
-      pass
-
-  logging:
-    version: 1
-    root:
-      handlers: [stdout]
-      level: INFO 
-    handlers:
-      stdout:
-        class: logging.StreamHandler
-        stream: ext://sys.stdout
-        formatter: timestamp
-    formatters:
-      timestamp:
-        format: "%(asctime)s %(levelname)s %(message)s"
+      # this policy just logs a message
+      import logging
+      logging.info("Handled {}/{}/{}".format(mailbox, message))
 
 Systemd User Service (Optional)
 -------------------------------
@@ -147,7 +205,7 @@ If you are running Systemd, you may configure a user service in order to run
      $ systemctl --user enable imaplar
      $ systemctl --user start imaplar
 
-3. (Optional) If you want the service to keep running when you are logged out, run the following command as root::
+3. If you want the service to keep running when you are logged out, run the following command as root::
 
      # loginctl enable-linger <your-username>
 
@@ -161,7 +219,7 @@ Each policy is a python script. The following global variables are provided:
   connected to the server
 * **mailbox**: the name of the monitored mailbox
 * **message**: the message id
-* **parameters**: server specific parameters from the configuration (if any)
+* **parameters**: parameters specified in the server configuration
 
 .. note::
    A policy script should *not* assume that the currently selected
