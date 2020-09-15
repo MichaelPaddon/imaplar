@@ -32,9 +32,9 @@ Installation
 Imaplar is `released on PyPI <https://pypi.org/project/imaplar/>`_,
 so all you need to do is:
 
-.. code-block:: sh
+.. code-block:: shell-session
 
-   pip3 install imaplar
+   $ pip3 install imaplar
 
 Configuration
 =============
@@ -211,16 +211,16 @@ If you are running Systemd, you may configure a user service in order to run
 
 2. Enable and start the service with these shell commands:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-     systemctl --user enable imaplar
-     systemctl --user start imaplar
+     $ systemctl --user enable imaplar
+     $ systemctl --user start imaplar
 
 3. If you want the service to keep running when you are logged out, run the following command as root:
 
-   .. code-block:: sh
+   .. code-block:: shell-session
 
-     loginctl enable-linger <your-username>
+     # loginctl enable-linger <your-username>
 
 Writing Policies
 ================
