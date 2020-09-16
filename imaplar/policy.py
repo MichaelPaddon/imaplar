@@ -177,3 +177,30 @@ def search_mailbox(client, mailbox, query):
 
     client.select_folder(mailbox, readonly = True)
     return client.search(query)
+
+def move_message(client, mailbox, message, to_mailbox):
+    """Move a message to a different mailbox.
+
+    Uses the IMAP MOVE capability if available, otherwise it copies the
+    message to the destination and then deletes the original.
+
+    :param client: imap client
+    :param mailbox: source mailbox name
+    :param message: message id
+    :param to_mailbox: destination mailbox name
+    :type client: imapclient.IMAPClient
+    :type mailbox: string
+    :type message: int
+    :type to_mailbox: string
+    """
+
+    if mailbox == to_mailbox:
+        return
+
+    client.select_folder(mailbox)
+    if b"MOVE" in client().capabilities:
+        client.move([message], to_mailbox)
+    else:
+        client.copy([message], to_mailbox)
+        client.delete_messages([message])
+    client.close_folder()

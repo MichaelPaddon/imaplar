@@ -84,7 +84,6 @@ class Session:
         # server capabilities
         capabilities = client.capabilities()
         has_idle = b"IDLE" in capabilities
-        has_move = b"MOVE" in capabilities
 
         # choose wait mechanism
         wait = self._wait_idle if has_idle else self._wait_poll
