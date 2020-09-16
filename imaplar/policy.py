@@ -5,7 +5,6 @@ make writing policies easier.
 
 import email.utils
 import functools
-import imapclient
 import itertools
 
 class Originators(set):
