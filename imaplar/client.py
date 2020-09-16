@@ -114,8 +114,8 @@ class Session:
                 "parameters": dict(self.parameters) if self.parameters else {}
             }
 
-            logging.info("processing {}/{}/{}".format(
-                self.host, self.mailbox, message))
+            logging.info("processing {}({})/{}/{}".format(
+                self.host, self.port, self.mailbox, message))
             try:
                 exec(self.policy, namespace)
             except Exception as e:
