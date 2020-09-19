@@ -4,14 +4,15 @@ Imaplar
 *Imaplar* [#f1]_ monitors one or more mailboxes on one or more IMAP servers.
 Unseen messages are passed to a user defined policy for processing.
 
-*Imaplar* operates in two phases:
+*Imaplar* is intended for the automated processing of incoming mail.
+Use cases include anti-spam measures and automated redirection.
+The tool operates in two phases:
 
-1. Startup. Each mailbox, on each monitored server, is examined for
-   unseen messages.
-   Each unseen message is passed to the policy associated with its mailbox.
+1. Startup. Each mailbox is examined for unseen messages.
+   Each unseen message is processed by the mailbox's policy.
 
-2. Ongoing. Each mailbox is watched for the arrival of new unseen messages.
-   Each new message is passed to its mailbox's policy.
+2. Ongoing. Each mailbox is monitored for new unseen messages.
+   When they arrive, they are processed by the policy.
 
 Synopsis
 ========
