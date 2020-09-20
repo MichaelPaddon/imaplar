@@ -6,6 +6,7 @@ make writing policies easier.
 import email.utils
 import functools
 import itertools
+import logging
 
 class Originators(set):
     """Envelope originator addresses.
@@ -30,10 +31,14 @@ class Recipients(set):
             envelope.to, envelope.cc, envelope.bcc))
 
 class Query(list):
-    """A list of IMAP search criteria."""
+    """A list of IMAP search criteria.
+
+    :param criteria: search criteria
+    :type criteria: iterable of strings
+    """
 
     def __call__(self, client, *mailboxes):
-        """Execute query.
+        """Generate message ids by executing query.
 
         :param client: imap client
         :param mailboxes: mailbox names
@@ -45,15 +50,38 @@ class Query(list):
 
         for mailbox in mailboxes:
             client.select_folder(mailbox, readonly = True)
-            yield from client.search(query)
+            logging.debug("query {}".format(str(self)))
+            yield from client.search(self)
 
     def __and__(self, query):
+        """AND queries together.
+
+        :param query: other query
+        :type query: Query
+        :return: a new query
+        :rtype: Query
+        """
+
         return Query([self, query])
 
     def __or__(self, query):
+        """OR queries together.
+
+        :param query: other query
+        :type query: Query
+        :return: a new query
+        :rtype: Query
+        """
+
         return Query(["OR", self, query])
 
     def __not__(self):
+        """NOT this query.
+
+        :return: a new query
+        :rtype: Query
+        """
+
         return Query(["NOT", query])
 
 class ToQuery(Query):

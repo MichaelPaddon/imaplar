@@ -245,6 +245,8 @@ The imaplar.policy module
 .. automodule:: imaplar.policy
    :members:
    :member-order: bysource
+   :special-members:
+   :exclude-members: __init__, __weakref__
    :show-inheritance:
 
 .. rubric:: Footnotes
