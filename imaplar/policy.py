@@ -217,7 +217,7 @@ def move_message(client, mailbox, message, to_mailbox):
         return
 
     client.select_folder(mailbox)
-    if b"MOVE" in client().capabilities:
+    if b"MOVE" in client.capabilities():
         client.move([message], to_mailbox)
     else:
         client.copy([message], to_mailbox)
