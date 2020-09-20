@@ -30,29 +30,33 @@ class Recipients(set):
             envelope.to, envelope.cc, envelope.bcc))
 
 class Query(list):
-    """A list of IMAP search criteria, which may be passed to
-    imapclient.IMAPClient.search().
-    """
+    """A list of IMAP search criteria."""
 
-    pass
+    def __call__(self, client, *mailboxes):
+        """Execute query.
 
-class OrQuery(Query):
-    """A query built from OR'd together sub-queries.
+        :param client: imap client
+        :param mailboxes: mailbox names
+        :type client: imapclient.IMAPClient
+        :type mailboxes: strings
+        :return: message ids
+        :rtype: generator of ints
+        """
 
-    :param queries: sub-queries
-    :type queries: iterable of lists
-    """
+        for mailbox in mailboxes:
+            client.select_folder(mailbox, readonly = True)
+            yield from client.search(query)
 
-    def __init__(self, queries):
-        super().__init__()
-        try:
-            queries = iter(queries)
-            self.extend(functools.reduce(
-                lambda x, y: ["OR", x, y], queries, next(queries)))
-        except StopIteration:
-            pass
+    def __and__(self, query):
+        return Query([self, query])
 
-class ToQuery(OrQuery):
+    def __or__(self, query):
+        return Query(["OR", self, query])
+
+    def __not__(self):
+        return Query(["NOT", query])
+
+class ToQuery(Query):
     """A query for "To" addresses.
 
     :param addresses: match any of these addresses
@@ -60,10 +64,11 @@ class ToQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["TO", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["TO", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class CcQuery(OrQuery):
+class CcQuery(Query):
     """A query for "Cc" addresses.
 
     :param addresses: match any of these addresses 
@@ -71,10 +76,11 @@ class CcQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["CC", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["CC", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class BccQuery(OrQuery):
+class BccQuery(Query):
     """A query for "Bcc" addresses.
 
     :param addresses: match any of these addresses 
@@ -82,10 +88,11 @@ class BccQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["BCC", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["BCC", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class FromQuery(OrQuery):
+class FromQuery(Query):
     """A query for "From" addresses.
 
     :param addresses: match any of these addresses 
@@ -93,10 +100,11 @@ class FromQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["FROM", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["FROM", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class SenderQuery(OrQuery):
+class SenderQuery(Query):
     """A query for "Sender" addresses.
 
     :param addresses: match any of these addresses 
@@ -104,10 +112,11 @@ class SenderQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["HEADER", "Sender", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["HEADER", "Sender", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class ReplyToQuery(OrQuery):
+class ReplyToQuery(Query):
     """A query for "Reply-To" addresses.
 
     :param addresses: match any of these addresses 
@@ -115,10 +124,11 @@ class ReplyToQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        emails = [email.utils.parseaddr(str(a))[1] for a in addresses] 
-        super().__init__(["HEADER", "Reply-To", e] for e in emails)
+        super().__init__(functools.reduce(lambda x, y: x | y,
+            (Query(["HEADER", "Reply-To", email.utils.parseaddr(str(a))[1]])
+                for a in addresses)))
 
-class OriginatorQuery(OrQuery):
+class OriginatorQuery(Query):
     """A query for "From", "Sender" and "Reply-To" addresses.
 
     :param addresses: match any of these addresses 
@@ -126,12 +136,11 @@ class OriginatorQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        super().__init__([
-            FromQuery(addresses),
-            SenderQuery(addresses),
-            ReplyToQuery(addresses)])
+        super().__init__(FromQuery(addresses)
+            | SenderQuery(addresses)
+            | ReplyToQuery(addresses))
 
-class RecipientQuery(OrQuery):
+class RecipientQuery(Query):
     """A query for "To", "Cc" and "Bcc" addresses.
 
     :param addresses: match any of these addresses 
@@ -139,10 +148,9 @@ class RecipientQuery(OrQuery):
     """
 
     def __init__(self, addresses):
-        super().__init__([
-            ToQuery(addresses),
-            CcQuery(addresses),
-            BccQuery(addresses)])
+        super().__init__(ToQuery(addresses)
+            | CcQuery(addresses)
+            | BccQuery(addresses))
 
 def fetch_envelope(client, mailbox, message):
     """Fetch the envelope of a message.
@@ -160,22 +168,6 @@ def fetch_envelope(client, mailbox, message):
     client.select_folder(mailbox, readonly = True)
     response = client.fetch([message], ["ENVELOPE"])
     return response[message][b"ENVELOPE"]
-
-def search_mailbox(client, mailbox, query):
-    """Search a mailbox.
-
-    :param client: imap client
-    :param mailbox: mailbox name
-    :param query: search criteria
-    :type client: imapclient.IMAPClient
-    :type mailbox: string
-    :type query: list of query terms
-    :return: message ids
-    :rtype: list
-    """
-
-    client.select_folder(mailbox, readonly = True)
-    return client.search(query)
 
 def move_message(client, mailbox, message, to_mailbox):
     """Move a message to a different mailbox.
