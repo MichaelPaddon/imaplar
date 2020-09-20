@@ -239,7 +239,7 @@ Each policy is a python script. The following global variables are provided:
    A policy script should *not* assume that the currently selected
    mailbox (if any) is the monitored mailbox.
 
-The imaplar.policy module
+The imaplar.policy Module
 -------------------------
 
 .. automodule:: imaplar.policy
@@ -248,6 +248,50 @@ The imaplar.policy module
    :special-members:
    :exclude-members: __init__, __weakref__
    :show-inheritance:
+
+Example Policy: Spamalot
+------------------------
+
+This policy assumes nearly all email is spam.
+Only messages from known originators are retained.
+
+.. code-block:: python
+
+   from imaplar.policy import *
+   import logging
+   import re
+
+   # per server parameters
+   outbox = parameters.get("outbox", "Sent")
+   spambox = parameters.get("spambox", "Spam")
+
+   # get envelope and extract originator addresses
+   envelope = fetch_envelope(client, mailbox, message)
+   originators = Originators(envelope)
+
+   # default is spam
+   spam = True
+
+   # have we sent mail to at least one of these originators?
+   query = RecipientQuery(originators)
+   if any(query(client, outbox)):
+       spam = False
+
+   # have we read mail from at least one of these originators?
+   query = Query(["SEEN"]) & OriginatorQuery(originators)
+   if any(query(client, mailbox)):
+       spam = False
+
+   # any noreply originator implies spam
+   noreply = re.compile(r"no.{0,2}reply", re.IGNORECASE)
+   if any(noreply.search(str(a)) for a in originators):
+       spam = True
+
+   # marked as spam?
+   if spam:
+       logging.info("{}({})/{}/{}: moving to {}".format(
+           client.host, client.port, mailbox, message, spambox))
+       move_message(client, mailbox, message, spambox)
 
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
