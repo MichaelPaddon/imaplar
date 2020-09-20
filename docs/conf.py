@@ -30,7 +30,7 @@ author = 'Michael Paddon'
 
 # The short X.Y version
 #version = imaplar.version.version()
-version = "0.10"
+version = "0.10.1"
 # The full version, including alpha/beta/rc tags
 #release = imaplar.version.version()
 release = version
