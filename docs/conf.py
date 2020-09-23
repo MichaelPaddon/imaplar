@@ -94,7 +94,10 @@ html_theme_options = {
     'description': 'Monitor IMAP mailboxes',
     'github_user': 'MichaelPaddon',
     'github_repo': 'imaplar',
-    'fixed_sidebar': True
+    'fixed_sidebar': True,
+    'logo': 'logo.png',
+    'logo_name': True,
+    'logo_text_align': 'left'
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

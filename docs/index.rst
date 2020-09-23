@@ -293,6 +293,16 @@ Only messages from known originators are retained.
            client.host, client.port, mailbox, message, spambox))
        move_message(client, mailbox, message, spambox)
 
+Licenses
+========
+
+This software, including documentation,
+is licensed under the GNU GENERAL PUBLIC LICENSE, Version 3.
+
+The *Imaplar* logo is a derivative work of an image licensed under the
+Creative Commons Attribution-Share Alike 3.0 Unported license.
+Attribution: Luis García.
+
 .. rubric:: Footnotes
 .. [#f1] The `Lares (singular Lar) <https://en.wikipedia.org/wiki/Lares>`_
    were ancient Roman guardian deities.
