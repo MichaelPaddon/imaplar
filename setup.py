@@ -18,6 +18,7 @@ setuptools.setup(
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
+        'Topic :: Communications :: Email :: Filters',
         'Topic :: Communications :: Email :: Post-Office :: IMAP',
     ],
     url = "https://github.com/MichaelPaddon/imaplar",
