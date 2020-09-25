@@ -22,16 +22,22 @@ sys.path.insert(0, os.path.abspath(
 
 # -- Project information -----------------------------------------------------
 
-import imaplar.version
+#import imaplar.version
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
+
+
 
 project = 'Imaplar'
 copyright = '2020, Michael Paddon'
 author = 'Michael Paddon'
 
 # The short X.Y version
-version = imaplar.version.version()
+version = metadata.version("imaplar")
 # The full version, including alpha/beta/rc tags
-release = imaplar.version.version()
+release = version
 
 
 # -- General configuration ---------------------------------------------------
