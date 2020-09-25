@@ -17,23 +17,21 @@
 # sys.path.insert(0, os.path.abspath('.'))
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..')))
 
 # -- Project information -----------------------------------------------------
 
-#import imaplar.version
+import imaplar.version
 
 project = 'Imaplar'
 copyright = '2020, Michael Paddon'
 author = 'Michael Paddon'
 
 # The short X.Y version
-#version = imaplar.version.version()
-version = "0.10.1"
+version = imaplar.version.version()
 # The full version, including alpha/beta/rc tags
-#release = imaplar.version.version()
-release = version
+release = imaplar.version.version()
 
 
 # -- General configuration ---------------------------------------------------
