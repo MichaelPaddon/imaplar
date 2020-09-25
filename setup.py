@@ -7,7 +7,7 @@ with open(os.path.join(directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name = "imaplar",
-    version = "0.10.1",
+    version = "0.10.2",
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP mailbox monitor",
@@ -15,9 +15,10 @@ setuptools.setup(
     long_description_content_type = "text/markdown",
     classifiers = [
         'Programming Language :: Python :: 3',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-        'Topic :: Communications :: Email'
+        'Operating System :: OS Independent',
+        'Topic :: Communications :: Email :: Post-Office :: IMAP',
     ],
     url = "https://github.com/MichaelPaddon/imaplar",
     license = "GPLv3+",
