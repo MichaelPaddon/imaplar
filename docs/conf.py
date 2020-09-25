@@ -15,20 +15,13 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import os
-import sys
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')))
 
 # -- Project information -----------------------------------------------------
 
-#import imaplar.version
 try:
     from importlib import metadata
 except ImportError:
     import importlib_metadata as metadata
-
-
 
 project = 'Imaplar'
 copyright = '2020, Michael Paddon'
@@ -38,7 +31,6 @@ author = 'Michael Paddon'
 version = metadata.version("imaplar")
 # The full version, including alpha/beta/rc tags
 release = version
-
 
 # -- General configuration ---------------------------------------------------
 
