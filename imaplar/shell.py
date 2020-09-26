@@ -16,9 +16,8 @@
 #
 
 """
-Imaplar is a program which monitors mailboxes on IMAP servers for
-incoming messages. When a message arrives, it is passed to a policy which
-decides how it should be handled.
+Imaplar monitors one or more mailboxes on one or more IMAP servers.
+Unseen messages are passed to a user defined policy for processing.
 """
 
 import argparse
