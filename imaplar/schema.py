@@ -151,6 +151,16 @@ config = {
                     "min": 0,
                     "default": 900
                 },
+                "min_backoff": {
+                    "type": "integer",
+                    "min": 1,
+                    "default": 1
+                },
+                "max_backoff": {
+                    "type": "integer",
+                    "min": 1,
+                    "default": 300
+                },
                 "mailboxes": {
                     "type": "dict",
                     "keysrules": {
