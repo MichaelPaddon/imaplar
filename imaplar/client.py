@@ -19,6 +19,7 @@ import collections.abc
 import dataclasses
 import enum
 import imapclient
+import imaplib
 import logging
 import ssl
 import tenacity
@@ -75,52 +76,71 @@ class Session:
     parameters: collections.abc.Mapping = None
 
     @tenacity.retry(
-            wait = tenacity.wait_exponential(max = 300),
-            after = tenacity.after_log(logging.getLogger(), logging.WARN))
-    def run_forever(self):
+        before = tenacity.before_log(logging.getLogger(), logging.DEBUG))
+    def run_forever(self, min = 1, max = 300):
+        """Repeatedly connect to the server and monitor for unseen mail.
+
+        Exponentially backoff on retries unless the connection was
+        aborted by the server. In that case, the backoff is reset to the
+        minimum value.
+
+        :param min: minimum backoff in seconds
+        :type min: int
+        :param max: maxiumum backoff in seconds
+        :type max: int
+        """
+
         try:
-            self.run()
+            logger = logging.getLogger()
+            backoff = tenacity.Retrying(
+                retry = tenacity.retry_unless_exception_type(
+                    imaplib.IMAP4.abort),
+                wait = tenacity.wait_exponential(min = min, max = max),
+                before = tenacity.before_log(logger, logging.DEBUG))
+            backoff(self.run)
         except:
             logging.exception("session aborted")
             raise
 
     def run(self):
+        """Connect to the server and monitor for unseen mail."""
+
+        # connect to IMAP server
         client = imapclient.IMAPClient(self.host,
             port = self.port, 
             ssl = self.tls_mode == TLSMode.ENABLED, 
             ssl_context = self.ssl_context) 
 
-        # start TLS?
-        if self.tls_mode == TLSMode.STARTTLS:
-            client.starttls(self.ssl_context)
+        with client:
+            # start TLS?
+            if self.tls_mode == TLSMode.STARTTLS:
+                client.starttls(self.ssl_context)
 
-        # perform authentication
-        if self.authenticator:
-            self.authenticator(client)
+            # perform authentication
+            if self.authenticator:
+                self.authenticator(client)
 
-        # server capabilities
-        capabilities = client.capabilities()
-        has_idle = b"IDLE" in capabilities
+            # choose wait mechanism
+            has_idle = b"IDLE" in client.capabilities()
+            wait = self._wait_idle if has_idle else self._wait_poll
 
-        # choose wait mechanism
-        wait = self._wait_idle if has_idle else self._wait_poll
-
-        # process unseen messages
-        client.select_folder(self.mailbox, readonly = True)
-        messages = client.search(["UNSEEN"])
-        for message in messages:
-            self._process(client, message)
-
-        # process incoming messages
-        next_message = max(messages) + 1 if messages else 1
-        while True:
+            # process unseen messages
             client.select_folder(self.mailbox, readonly = True)
-            wait(client)
-            messages = client.search(["{}:*".format(next_message), "UNSEEN"])
+            messages = client.search(["UNSEEN"])
             for message in messages:
                 self._process(client, message)
-            if messages:
-                next_message = max(messages) + 1
+
+            # process incoming messages
+            next_message = max(messages) + 1 if messages else 1
+            while True:
+                client.select_folder(self.mailbox, readonly = True)
+                wait(client)
+                messages = client.search(
+                    ["{}:*".format(next_message), "UNSEEN"])
+                for message in messages:
+                    self._process(client, message)
+                if messages:
+                    next_message = max(messages) + 1
 
     def _process(self, client, message):
         if self.policy:
