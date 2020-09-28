@@ -156,7 +156,9 @@ def main(argv = sys.argv):
 
     # run sessions
     for session in sessions:
-        thread = threading.Thread(target = session.run_forever)
+        thread = threading.Thread(target = session.run_forever, kwargs = {
+           "min": server_config["min_backoff"],
+           "max": server_config["max_backoff"]})
         thread.start()
 
 if __name__ == "__main__":
