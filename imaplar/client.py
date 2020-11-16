@@ -161,6 +161,7 @@ class Session:
     def _wait_poll(self, client):
         while True:
             response = client.noop()
+            logging.debug("waiting: noop: {}".format(response))
             if response:
                 if any([x for x in response[1] if x[1] == b"EXISTS"]):
                     return
@@ -175,10 +176,13 @@ class Session:
         client.idle()
         while True:
             response = client.idle_check(alarm - now)
+            logging.debug("waiting: idle_check: {}".format(response))
             if response:
                 if any([x for x in response if x[1] == b"EXISTS"]):
                     client.idle_done()
                     return
+            else:
+                raise ConnectionError("connection dropped")
 
             now = time.time()
             if now >= alarm:
