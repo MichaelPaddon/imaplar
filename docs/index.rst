@@ -196,7 +196,7 @@ Systemd User Service (Optional)
 If you are running Systemd, you may configure a user service in order to run
 *imaplar* automatically.
 
-1. Create the file ``~/.config/systemd/imaplar.server``:
+1. Create the file ``~/.config/systemd/user/imaplar.service``:
 
    .. code-block:: INI
 
