@@ -296,7 +296,7 @@ Only messages from known originators are retained.
 Licenses
 ========
 
-Copyright (C) 2017-2020 Michael Paddon
+Copyright (C) 2017-2022 Michael Paddon
 
 This program, including this manual, is free software:
 you can redistribute it and/or modify

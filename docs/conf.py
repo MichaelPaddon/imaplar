@@ -27,7 +27,7 @@ except ImportError:
     import importlib_metadata as metadata
 
 project = 'Imaplar'
-copyright = '2020, Michael Paddon'
+copyright = '2022, Michael Paddon'
 author = 'Michael Paddon'
 
 # The short X.Y version
