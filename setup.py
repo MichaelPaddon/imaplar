@@ -7,7 +7,7 @@ with open(os.path.join(directory, 'README.md'), encoding='utf-8') as f:
 
 setuptools.setup(
     name = "imaplar",
-    version = "1.0.0",
+    version = "1.0.1",
     author = "Michael Paddon",
     author_email = "michael@paddon.org",
     description = "IMAP mailbox monitor",
