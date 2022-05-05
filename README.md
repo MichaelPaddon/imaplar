@@ -8,7 +8,7 @@ See [the manual](//imaplar.readthedocs.io/en/latest/) for more information.
 Imaplar is [released on PyPI](https://pypi.org/project/imaplar/),
 so all you need to do is:
 ```
-$ pip3 install imaplar
+$ pip install imaplar
 ```
 
 ## License

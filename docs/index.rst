@@ -35,7 +35,7 @@ so all you need to do is:
 
 .. code-block:: shell-session
 
-   $ pip3 install imaplar
+   $ pip install imaplar
 
 Configuration
 =============
